@@ -36,8 +36,12 @@ Future<T?> showLegacyDraggableDialog<T>({
   EdgeInsets insetPadding = const EdgeInsets.all(10.0),
   DraggableDialogThemeData? theme,
 }) {
-  final bool hasClosingMechanism =
-      onClose != null || onOk != null || onCancel != null || header != null || footer != null || (actions != null && actions.isNotEmpty);
+  final bool hasClosingMechanism = onClose != null ||
+      onOk != null ||
+      onCancel != null ||
+      header != null ||
+      footer != null ||
+      (actions != null && actions.isNotEmpty);
 
   assert(
     barrierDismissible || hasClosingMechanism,
@@ -56,15 +60,19 @@ Future<T?> showLegacyDraggableDialog<T>({
       final dialogTheme = theme ?? DraggableDialogThemeData.from(dialogContext);
 
       // Default Header
-      final Widget effectiveHeader =
-          header ??
+      final Widget effectiveHeader = header ??
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(title, style: dialogTheme.titleStyle),
-                if (onClose != null) IconButton(icon: const Icon(Icons.close), onPressed: onClose, tooltip: 'Close'),
+                if (onClose != null)
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: onClose,
+                      tooltip: 'Close'),
               ],
             ),
           );
@@ -78,11 +86,20 @@ Future<T?> showLegacyDraggableDialog<T>({
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: actions.map((e) => Padding(padding: const EdgeInsets.symmetric(horizontal: 4.0), child: e)).toList(),
+            children: actions
+                .map((e) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: e))
+                .toList(),
           ),
         );
       } else if (onOk != null || onCancel != null) {
-        effectiveFooter = DialogFooter(onOk: onOk, onCancel: onCancel, okText: okText, cancelText: cancelText, theme: dialogTheme);
+        effectiveFooter = DialogFooter(
+            onOk: onOk,
+            onCancel: onCancel,
+            okText: okText,
+            cancelText: cancelText,
+            theme: dialogTheme);
       }
 
       return DraggableDialog(
@@ -107,7 +124,9 @@ Future<T?> showLegacyDraggableDialog<T>({
 /// part of the UI that will act as the drag handle.
 Future<T?> showDraggableDialogWithBuilder<T>({
   required BuildContext context,
-  required Widget Function(BuildContext context, void Function(DragUpdateDetails) onDragUpdate) builder,
+  required Widget Function(
+          BuildContext context, void Function(DragUpdateDetails) onDragUpdate)
+      builder,
   double? width,
   double? height,
   Alignment initialAlignment = Alignment.center,
@@ -128,10 +147,13 @@ Future<T?> showDraggableDialogWithBuilder<T>({
           void handleHeaderPanUpdate(DragUpdateDetails details) {
             final currentScreenSize = MediaQuery.of(builderContext).size;
             final double modalWidth = width ?? (currentScreenSize.width * 0.8);
-            final double modalHeight = height ?? (currentScreenSize.height * 0.8);
+            final double modalHeight =
+                height ?? (currentScreenSize.height * 0.8);
 
-            double halfSlackWidth = (currentScreenSize.width - modalWidth) / 2.0;
-            double halfSlackHeight = (currentScreenSize.height - modalHeight) / 2.0;
+            double halfSlackWidth =
+                (currentScreenSize.width - modalWidth) / 2.0;
+            double halfSlackHeight =
+                (currentScreenSize.height - modalHeight) / 2.0;
 
             double dAlignX = 0;
             if (halfSlackWidth > 1e-6) {
@@ -146,7 +168,9 @@ Future<T?> showDraggableDialogWithBuilder<T>({
             setState(() {
               double newAlignmentX = currentDialogAlignmentState.x + dAlignX;
               double newAlignmentY = currentDialogAlignmentState.y + dAlignY;
-              currentDialogAlignmentState = Alignment(newAlignmentX.clamp(-1.0, 1.0), newAlignmentY.clamp(-1.0, 1.0));
+              currentDialogAlignmentState = Alignment(
+                  newAlignmentX.clamp(-1.0, 1.0),
+                  newAlignmentY.clamp(-1.0, 1.0));
             });
           }
 

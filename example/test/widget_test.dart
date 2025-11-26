@@ -4,13 +4,15 @@ import 'package:example/main.dart';
 
 void main() {
   setUp(() {
-    final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+    final TestWidgetsFlutterBinding binding =
+        TestWidgetsFlutterBinding.ensureInitialized();
     binding.window.physicalSizeTestValue = const Size(1920, 1080);
     binding.window.devicePixelRatioTestValue = 1.0;
   });
 
   tearDown(() {
-    final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+    final TestWidgetsFlutterBinding binding =
+        TestWidgetsFlutterBinding.ensureInitialized();
     binding.window.clearPhysicalSizeTestValue();
     binding.window.clearDevicePixelRatioTestValue();
   });
@@ -38,9 +40,13 @@ void main() {
     expect(find.text('Simple Dialog'), findsNothing);
   });
 
-  testWidgets('Simple Dialog with Close Button test', (WidgetTester tester) async {
+  testWidgets('Simple Dialog with Close Button test', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
-    final buttonFinder = find.text('Show Simple Dialog With Close Button in Title');
+    final buttonFinder = find.text(
+      'Show Simple Dialog With Close Button in Title',
+    );
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
     await tester.pumpAndSettle();
@@ -133,7 +139,9 @@ void main() {
     expect(find.text('Delete'), findsOneWidget);
 
     // Verify button color is red (danger)
-    final button = tester.widget<ElevatedButton>(find.widgetWithText(ElevatedButton, 'Delete'));
+    final button = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Delete'),
+    );
     expect(button.style?.backgroundColor?.resolve({}), Colors.red);
 
     await tester.tap(find.text('Delete'));
@@ -236,8 +244,14 @@ void main() {
     expect(find.text('Please enter a username'), findsOneWidget);
 
     // Enter data
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'testuser');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'password123');
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Username'),
+      'testuser',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Password'),
+      'password123',
+    );
     await tester.pump();
 
     await tester.tap(find.text('Submit'));
@@ -250,7 +264,8 @@ void main() {
     final buttonFinder = find.text('Show Loading Dialog');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
-    await tester.pump(); // Just pump, don't settle yet as it might have animation
+    await tester
+        .pump(); // Just pump, don't settle yet as it might have animation
 
     expect(find.text('Processing...'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -309,19 +324,34 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Collapsible Dialog'), findsOneWidget);
-    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsOneWidget);
+    expect(
+      find.text(
+        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
+      ),
+      findsOneWidget,
+    );
 
     // Collapse
     await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
     await tester.pumpAndSettle();
 
     // Body should be gone (SizedBox.shrink) or not found
-    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsNothing);
+    expect(
+      find.text(
+        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
+      ),
+      findsNothing,
+    );
 
     // Expand
     await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
     await tester.pumpAndSettle();
-    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsOneWidget);
+    expect(
+      find.text(
+        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
+      ),
+      findsOneWidget,
+    );
 
     // Close
     await tester.tap(find.widgetWithIcon(IconButton, Icons.close));

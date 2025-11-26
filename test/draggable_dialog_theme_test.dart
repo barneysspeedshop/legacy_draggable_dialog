@@ -4,7 +4,8 @@ import 'package:legacy_draggable_dialog/draggable_dialog.dart';
 
 void main() {
   group('DraggableDialogThemeData', () {
-    testWidgets('from creates light theme correctly', (WidgetTester tester) async {
+    testWidgets('from creates light theme correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
@@ -21,7 +22,8 @@ void main() {
       );
     });
 
-    testWidgets('from creates dark theme correctly', (WidgetTester tester) async {
+    testWidgets('from creates dark theme correctly',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
@@ -39,7 +41,10 @@ void main() {
     });
 
     test('constructor assigns values correctly', () {
-      const theme = DraggableDialogThemeData(headerColor: Colors.red, contentColor: Colors.green, footerColor: Colors.blue);
+      const theme = DraggableDialogThemeData(
+          headerColor: Colors.red,
+          contentColor: Colors.green,
+          footerColor: Colors.blue);
       expect(theme.headerColor, Colors.red);
       expect(theme.contentColor, Colors.green);
       expect(theme.footerColor, Colors.blue);

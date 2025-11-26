@@ -1,5 +1,5 @@
 name: legacy_draggable_dialog
-description: "A draggable dialog helper for Flutter."
+description: "A draggable dialog helper for Flutter. You can use it to create a fully customizable dialog with a draggable header. Stays within the bounds of the screen."
 version: 0.0.1
 license: MIT
 homepage: https://github.com/barneysspeedshop/legacy_draggable_dialog

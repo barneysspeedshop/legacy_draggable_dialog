@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legacy_draggable_dialog/legacy_draggable_dialog.dart';
 
 void main() {
-  testWidgets('showLegacyDraggableDialog shows a dialog', (WidgetTester tester) async {
+  testWidgets('showLegacyDraggableDialog shows a dialog',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -45,7 +46,8 @@ void main() {
     expect(find.text('Test Dialog'), findsNothing);
   });
 
-  testWidgets('throws assertion error if no close mechanism provided', (WidgetTester tester) async {
+  testWidgets('throws assertion error if no close mechanism provided',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -86,8 +88,10 @@ void main() {
                     context: context,
                     body: const Text('Body'),
                     actions: [
-                      TextButton(onPressed: () {}, child: const Text('Action 1')),
-                      TextButton(onPressed: () {}, child: const Text('Action 2')),
+                      TextButton(
+                          onPressed: () {}, child: const Text('Action 1')),
+                      TextButton(
+                          onPressed: () {}, child: const Text('Action 2')),
                     ],
                   );
                 },
@@ -118,7 +122,10 @@ void main() {
                     context: context,
                     body: const Text('Body'),
                     footer: const Text('Custom Footer'),
-                    actions: [TextButton(onPressed: () {}, child: const Text('Action 1'))],
+                    actions: [
+                      TextButton(
+                          onPressed: () {}, child: const Text('Action 1'))
+                    ],
                   );
                 },
                 child: const Text('Show Dialog'),
@@ -144,7 +151,13 @@ void main() {
             builder: (context) {
               return ElevatedButton(
                 onPressed: () {
-                  showLegacyDraggableDialog(context: context, body: const Text('Body'), onOk: () {}, onCancel: () {}, okText: 'Yes', cancelText: 'No');
+                  showLegacyDraggableDialog(
+                      context: context,
+                      body: const Text('Body'),
+                      onOk: () {},
+                      onCancel: () {},
+                      okText: 'Yes',
+                      cancelText: 'No');
                 },
                 child: const Text('Show Dialog'),
               );
@@ -160,7 +173,8 @@ void main() {
     expect(find.text('Yes'), findsOneWidget);
     expect(find.text('No'), findsOneWidget);
   });
-  testWidgets('dialog moves when header is dragged', (WidgetTester tester) async {
+  testWidgets('dialog moves when header is dragged',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -199,7 +213,8 @@ void main() {
     expect(dialogAfter.alignment, isNot(Alignment.center));
     // We can't easily assert exact alignment without knowing screen size, but it should change.
   });
-  testWidgets('dialog does not move when size equals screen size', (WidgetTester tester) async {
+  testWidgets('dialog does not move when size equals screen size',
+      (WidgetTester tester) async {
     // Set a fixed screen size
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;

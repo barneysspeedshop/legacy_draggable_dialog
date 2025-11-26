@@ -29,23 +29,29 @@ class DraggableDialogThemeData {
             headerColor: Colors.grey[800],
             contentColor: const Color(0xFF202020),
             footerColor: Colors.grey[850],
-            titleStyle: theme.textTheme.titleLarge?.copyWith(color: Colors.white70),
+            titleStyle:
+                theme.textTheme.titleLarge?.copyWith(color: Colors.white70),
             buttonStyle: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3b89b9),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
             ),
-            buttonTextStyle: theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+            buttonTextStyle:
+                theme.textTheme.labelLarge?.copyWith(color: Colors.white),
           )
         : DraggableDialogThemeData(
             headerColor: Colors.blueGrey[50],
             contentColor: Colors.white,
             footerColor: Colors.grey[100],
-            titleStyle: theme.textTheme.titleLarge?.copyWith(color: Colors.black87),
+            titleStyle:
+                theme.textTheme.titleLarge?.copyWith(color: Colors.black87),
             buttonStyle: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3b89b9),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5)),
             ),
-            buttonTextStyle: theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+            buttonTextStyle:
+                theme.textTheme.labelLarge?.copyWith(color: Colors.white),
           );
   }
 }

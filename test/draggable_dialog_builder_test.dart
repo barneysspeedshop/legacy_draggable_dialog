@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:legacy_draggable_dialog/legacy_draggable_dialog.dart';
 
 void main() {
-  testWidgets('showDraggableDialogWithBuilder renders content', (WidgetTester tester) async {
+  testWidgets('showDraggableDialogWithBuilder renders content',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -14,7 +15,9 @@ void main() {
                   showDraggableDialogWithBuilder(
                     context: context,
                     builder: (context, onDragUpdate) {
-                      return Container(color: Colors.white, child: const Text('Builder Content'));
+                      return Container(
+                          color: Colors.white,
+                          child: const Text('Builder Content'));
                     },
                   );
                 },
@@ -45,7 +48,11 @@ void main() {
                     builder: (context, onDragUpdate) {
                       return GestureDetector(
                         onPanUpdate: onDragUpdate,
-                        child: Container(width: 200, height: 200, color: Colors.blue, child: const Text('Drag Me')),
+                        child: Container(
+                            width: 200,
+                            height: 200,
+                            color: Colors.blue,
+                            child: const Text('Drag Me')),
                       );
                     },
                   );
@@ -76,7 +83,9 @@ void main() {
     expect(newLocation.dy, greaterThan(initialLocation.dy));
   });
 
-  testWidgets('dragging does not move dialog if width/height equals screen size', (WidgetTester tester) async {
+  testWidgets(
+      'dragging does not move dialog if width/height equals screen size',
+      (WidgetTester tester) async {
     // Set a fixed screen size for the test
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;
@@ -95,7 +104,9 @@ void main() {
                     builder: (context, onDragUpdate) {
                       return GestureDetector(
                         onPanUpdate: onDragUpdate,
-                        child: Container(color: Colors.red, child: const Text('Full Screen Drag')),
+                        child: Container(
+                            color: Colors.red,
+                            child: const Text('Full Screen Drag')),
                       );
                     },
                   );
@@ -128,7 +139,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   });
 
-  testWidgets('dragging clamps to screen boundaries', (WidgetTester tester) async {
+  testWidgets('dragging clamps to screen boundaries',
+      (WidgetTester tester) async {
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;
 
@@ -146,7 +158,9 @@ void main() {
                     builder: (context, onDragUpdate) {
                       return GestureDetector(
                         onPanUpdate: onDragUpdate,
-                        child: Container(color: Colors.green, child: const Text('Clamp Drag')),
+                        child: Container(
+                            color: Colors.green,
+                            child: const Text('Clamp Drag')),
                       );
                     },
                   );
@@ -188,7 +202,8 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   });
 
-  testWidgets('dragging works with default size (no width/height provided)', (WidgetTester tester) async {
+  testWidgets('dragging works with default size (no width/height provided)',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -202,7 +217,9 @@ void main() {
                     builder: (context, onDragUpdate) {
                       return GestureDetector(
                         onPanUpdate: onDragUpdate,
-                        child: Container(color: Colors.yellow, child: const Text('Default Size Drag')),
+                        child: Container(
+                            color: Colors.yellow,
+                            child: const Text('Default Size Drag')),
                       );
                     },
                   );
@@ -245,7 +262,9 @@ void main() {
                     context: context,
                     initialAlignment: Alignment.topLeft,
                     builder: (context, onDragUpdate) {
-                      return Container(color: Colors.purple, child: const Text('Aligned Dialog'));
+                      return Container(
+                          color: Colors.purple,
+                          child: const Text('Aligned Dialog'));
                     },
                   );
                 },
@@ -272,7 +291,8 @@ void main() {
     expect(dialogCenter.dy, lessThan(screenCenter.dy));
   });
 
-  testWidgets('dragging is disabled if dialog is larger than screen', (WidgetTester tester) async {
+  testWidgets('dragging is disabled if dialog is larger than screen',
+      (WidgetTester tester) async {
     tester.view.physicalSize = const Size(400, 300);
     tester.view.devicePixelRatio = 1.0;
 
@@ -290,7 +310,9 @@ void main() {
                     builder: (context, onDragUpdate) {
                       return GestureDetector(
                         onPanUpdate: onDragUpdate,
-                        child: Container(color: Colors.orange, child: const Text('Large Dialog')),
+                        child: Container(
+                            color: Colors.orange,
+                            child: const Text('Large Dialog')),
                       );
                     },
                   );

@@ -8,7 +8,8 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DraggableDialog(body: const Text('Dialog Body'), onDragUpdate: (_) {}),
+            body: DraggableDialog(
+                body: const Text('Dialog Body'), onDragUpdate: (_) {}),
           ),
         ),
       );
@@ -16,11 +17,16 @@ void main() {
       expect(find.text('Dialog Body'), findsOneWidget);
     });
 
-    testWidgets('renders header and footer when provided', (WidgetTester tester) async {
+    testWidgets('renders header and footer when provided',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: DraggableDialog(header: const Text('Header'), body: const Text('Body'), footer: const Text('Footer'), onDragUpdate: (_) {}),
+            body: DraggableDialog(
+                header: const Text('Header'),
+                body: const Text('Body'),
+                footer: const Text('Footer'),
+                onDragUpdate: (_) {}),
           ),
         ),
       );
@@ -30,7 +36,8 @@ void main() {
       expect(find.text('Footer'), findsOneWidget);
     });
 
-    testWidgets('expands content when expandContent is true', (WidgetTester tester) async {
+    testWidgets('expands content when expandContent is true',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -38,7 +45,10 @@ void main() {
               children: [
                 SizedBox(
                   height: 500,
-                  child: DraggableDialog(body: const Text('Body'), onDragUpdate: (_) {}, expandContent: true),
+                  child: DraggableDialog(
+                      body: const Text('Body'),
+                      onDragUpdate: (_) {},
+                      expandContent: true),
                 ),
               ],
             ),
@@ -46,15 +56,19 @@ void main() {
         ),
       );
 
-      final bodyFinder = find.ancestor(of: find.text('Body'), matching: find.byType(Container)).first;
+      final bodyFinder = find
+          .ancestor(of: find.text('Body'), matching: find.byType(Container))
+          .first;
 
       // Check if the body container is wrapped in an Expanded widget
       // Note: This is a bit indirect. A better way is to check the size if possible,
       // but checking for Expanded ancestor in the widget tree is also valid for structure.
-      expect(find.ancestor(of: bodyFinder, matching: find.byType(Expanded)), findsOneWidget);
+      expect(find.ancestor(of: bodyFinder, matching: find.byType(Expanded)),
+          findsOneWidget);
     });
 
-    testWidgets('does not expand content when expandContent is false', (WidgetTester tester) async {
+    testWidgets('does not expand content when expandContent is false',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -62,7 +76,10 @@ void main() {
               children: [
                 SizedBox(
                   height: 500,
-                  child: DraggableDialog(body: const Text('Body'), onDragUpdate: (_) {}, expandContent: false),
+                  child: DraggableDialog(
+                      body: const Text('Body'),
+                      onDragUpdate: (_) {},
+                      expandContent: false),
                 ),
               ],
             ),
@@ -70,7 +87,9 @@ void main() {
         ),
       );
 
-      final bodyFinder = find.ancestor(of: find.text('Body'), matching: find.byType(Container)).first;
+      final bodyFinder = find
+          .ancestor(of: find.text('Body'), matching: find.byType(Container))
+          .first;
 
       // Should not find Expanded ancestor directly wrapping the body container logic
       // This is tricky because Column/Row might use Expanded.
@@ -78,7 +97,8 @@ void main() {
 
       // Let's verify by size. If not expanded, it should be small.
       final Size bodySize = tester.getSize(bodyFinder);
-      expect(bodySize.height, lessThan(400)); // Arbitrary check, assuming text is small
+      expect(bodySize.height,
+          lessThan(400)); // Arbitrary check, assuming text is small
     });
   });
 }
