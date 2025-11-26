@@ -2,6 +2,7 @@ name: legacy_draggable_dialog
 description: "A draggable dialog helper for Flutter."
 version: 0.0.1
 license: MIT
+publish_to: pub.dev
 homepage: https://github.com/barneysspeedshop/legacy_draggable_dialog
 repository: https://github.com/barneysspeedshop/legacy_draggable_dialog
 issue_tracker: https://github.com/barneysspeedshop/legacy_draggable_dialog/issues
