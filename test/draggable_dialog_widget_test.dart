@@ -57,7 +57,7 @@ void main() {
       );
 
       final bodyFinder = find
-          .ancestor(of: find.text('Body'), matching: find.byType(Container))
+          .ancestor(of: find.text('Body'), matching: find.byType(Material))
           .first;
 
       // Check if the body container is wrapped in an Expanded widget
@@ -88,12 +88,12 @@ void main() {
       );
 
       final bodyFinder = find
-          .ancestor(of: find.text('Body'), matching: find.byType(Container))
+          .ancestor(of: find.text('Body'), matching: find.byType(Material))
           .first;
 
       // Should not find Expanded ancestor directly wrapping the body container logic
       // This is tricky because Column/Row might use Expanded.
-      // We rely on the implementation detail that _buildBody returns Expanded or Container.
+      // We rely on the implementation detail that _buildBody returns Expanded or Material.
 
       // Let's verify by size. If not expanded, it should be small.
       final Size bodySize = tester.getSize(bodyFinder);

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:legacy_draggable_dialog/legacy_draggable_dialog.dart';
 import 'package:legacy_draggable_dialog/draggable_dialog.dart';
@@ -15,16 +16,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Draggable Dialog Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue), useMaterial3: true),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.dark,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
@@ -41,10 +36,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
-      ),
+      appBar: AppBar(backgroundColor: Theme.of(context).colorScheme.inversePrimary, title: Text(title)),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -53,87 +45,37 @@ class MyHomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ElevatedButton(
-                  onPressed: () => _showSimpleDialog(context),
-                  child: const Text('Show Simple Dialog'),
-                ),
+                ElevatedButton(onPressed: () => _showSimpleDialog(context), child: const Text('Show Simple Dialog')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showSimpleDialogWithClose(context),
-                  child: const Text(
-                    'Show Simple Dialog With Close Button in Title',
-                  ),
-                ),
+                ElevatedButton(onPressed: () => _showSimpleDialogWithClose(context), child: const Text('Show Simple Dialog With Close Button in Title')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showCustomActionsDialog(context),
-                  child: const Text('Show Dialog with Custom Actions'),
-                ),
+                ElevatedButton(onPressed: () => _showCustomActionsDialog(context), child: const Text('Show Dialog with Custom Actions')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showCustomFooterDialog(context),
-                  child: const Text('Show Dialog with Custom Footer'),
-                ),
+                ElevatedButton(onPressed: () => _showCustomFooterDialog(context), child: const Text('Show Dialog with Custom Footer')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showCustomHeaderDialog(context),
-                  child: const Text('Show Dialog with Custom Header'),
-                ),
+                ElevatedButton(onPressed: () => _showCustomHeaderDialog(context), child: const Text('Show Dialog with Custom Header')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showDialogWithThemedButton(context),
-                  child: const Text('Show Dialog with Themed Button'),
-                ),
+                ElevatedButton(onPressed: () => _showDialogWithThemedButton(context), child: const Text('Show Dialog with Themed Button')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showDialogWithDangerTheme(context),
-                  child: const Text('Show Dialog with Danger Theme'),
-                ),
+                ElevatedButton(onPressed: () => _showDialogWithDangerTheme(context), child: const Text('Show Dialog with Danger Theme')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showDialogWithSuccessTheme(context),
-                  child: const Text('Show Dialog with Success Theme'),
-                ),
+                ElevatedButton(onPressed: () => _showDialogWithSuccessTheme(context), child: const Text('Show Dialog with Success Theme')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showDialogWithCustomButtons(context),
-                  child: const Text('Show Dialog with Custom Buttons'),
-                ),
+                ElevatedButton(onPressed: () => _showDialogWithCustomButtons(context), child: const Text('Show Dialog with Custom Buttons')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showScrollableDialog(context),
-                  child: const Text('Show Dialog with Scrollable Body'),
-                ),
+                ElevatedButton(onPressed: () => _showScrollableDialog(context), child: const Text('Show Dialog with Scrollable Body')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showExpandableDialog(context),
-                  child: const Text('Show Dialog with Expandable Sections'),
-                ),
+                ElevatedButton(onPressed: () => _showExpandableDialog(context), child: const Text('Show Dialog with Expandable Sections')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showFormDialog(context),
-                  child: const Text('Show Dialog with Form'),
-                ),
+                ElevatedButton(onPressed: () => _showFormDialog(context), child: const Text('Show Dialog with Form')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showLoadingDialog(context),
-                  child: const Text('Show Loading Dialog'),
-                ),
+                ElevatedButton(onPressed: () => _showLoadingDialog(context), child: const Text('Show Loading Dialog')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showTabbedDialog(context),
-                  child: const Text('Show Dialog with Tabs'),
-                ),
+                ElevatedButton(onPressed: () => _showTabbedDialog(context), child: const Text('Show Dialog with Tabs')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showTabbedViewDialog(context),
-                  child: const Text('Show Dialog with Tabbed View Package'),
-                ),
+                ElevatedButton(onPressed: () => _showTabbedViewDialog(context), child: const Text('Show Dialog with Tabbed View Package')),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _showCollapsibleDialog(context),
-                  child: const Text('Show Collapsible Dialog'),
-                ),
+                ElevatedButton(onPressed: () => _showCollapsibleDialog(context), child: const Text('Show Collapsible Dialog')),
               ],
             ),
           ),
@@ -147,20 +89,12 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Simple Dialog',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('This is a basic dialog with OK button.'),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('This is a basic dialog with OK button.')),
       ),
       width: 800,
       height: 200,
       maxHeight: 150,
-      actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        ),
-      ],
+      actions: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
     );
   }
 
@@ -169,21 +103,13 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Simple Dialog',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('This is a basic dialog with OK button.'),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('This is a basic dialog with OK button.')),
       ),
       width: 800,
       height: 200,
       maxHeight: 150,
       onClose: () => Navigator.of(context).pop(),
-      actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        ),
-      ],
+      actions: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
     );
   }
 
@@ -192,12 +118,7 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Dialog with Actions',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'This dialog uses the `actions` parameter to build a custom footer.',
-          ),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('This dialog uses the `actions` parameter to build a custom footer.')),
       ),
       width: 800,
       height: 250,
@@ -214,10 +135,7 @@ class MyHomePage extends StatelessWidget {
           },
         ),
         ElevatedButton(onPressed: () {}, child: const Text('Help')),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Confirm'),
-        ),
+        ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Confirm')),
       ],
     );
   }
@@ -226,23 +144,18 @@ class MyHomePage extends StatelessWidget {
     showLegacyDraggableDialog(
       context: context,
       title: 'Custom Footer',
-      body: const Center(
-        child: Text('This dialog uses a completely custom footer widget.'),
-      ),
+      body: const Center(child: Text('This dialog uses a completely custom footer widget.')),
       width: 800,
       height: 200,
       onClose: () => Navigator.of(context).pop(),
       footer: Container(
-        color: Colors.deepPurple.withOpacity(0.2),
+        color: Colors.deepPurple.withValues(alpha: 0.2),
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Icon(Icons.info_outline),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Dismiss'),
-            ),
+            ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Dismiss')),
           ],
         ),
       ),
@@ -253,9 +166,7 @@ class MyHomePage extends StatelessWidget {
     showLegacyDraggableDialog(
       context: context,
       // title is ignored because a custom header is provided
-      body: const Center(
-        child: Text('This dialog uses a completely custom header widget.'),
-      ),
+      body: const Center(child: Text('This dialog uses a completely custom header widget.')),
       width: 800,
       height: 200,
       header: Container(
@@ -265,10 +176,7 @@ class MyHomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Icon(Icons.drag_handle, color: Colors.white),
-            const Text(
-              'Custom Draggable Header',
-              style: TextStyle(color: Colors.white),
-            ),
+            const Text('Custom Draggable Header', style: TextStyle(color: Colors.white)),
             IconButton(
               icon: const Icon(Icons.close, color: Colors.white),
               onPressed: () => Navigator.of(context).pop(),
@@ -286,9 +194,7 @@ class MyHomePage extends StatelessWidget {
       body: const Center(
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: Text(
-            'This dialog uses `onOk` to show the default themed button from `DraggableDialogThemeData`.',
-          ),
+          child: Text('This dialog uses `onOk` to show the default themed button from `DraggableDialogThemeData`.'),
         ),
       ),
       width: 800,
@@ -304,10 +210,7 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Danger Zone',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('This action is irreversible. Are you sure?'),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('This action is irreversible. Are you sure?')),
       ),
       width: 800,
       height: 200,
@@ -315,10 +218,7 @@ class MyHomePage extends StatelessWidget {
       onOk: () => Navigator.of(context).pop(),
       okText: 'Delete',
       theme: DraggableDialogThemeData(
-        buttonStyle: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
-        ),
+        buttonStyle: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
       ),
     );
   }
@@ -328,10 +228,7 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Success!',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('The operation was completed successfully.'),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('The operation was completed successfully.')),
       ),
       width: 800,
       height: 200,
@@ -339,15 +236,8 @@ class MyHomePage extends StatelessWidget {
       onOk: () => Navigator.of(context).pop(),
       okText: 'Great!',
       theme: DraggableDialogThemeData(
-        titleStyle: const TextStyle(
-          color: Colors.green,
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
-        buttonStyle: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
-        ),
+        titleStyle: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 20),
+        buttonStyle: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
       ),
     );
   }
@@ -357,12 +247,7 @@ class MyHomePage extends StatelessWidget {
       context: context,
       title: 'Dialog with Custom Buttons',
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'This dialog demonstrates using different button types in the `actions` parameter.',
-          ),
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0), child: Text('This dialog demonstrates using different button types in the `actions` parameter.')),
       ),
       width: 800,
       height: 250,
@@ -370,10 +255,7 @@ class MyHomePage extends StatelessWidget {
       actions: [
         TextButton(onPressed: () {}, child: const Text('TextButton')),
         OutlinedButton(onPressed: () {}, child: const Text('Outlined')),
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Elevated'),
-        ),
+        ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Elevated')),
       ],
     );
   }
@@ -385,21 +267,13 @@ class MyHomePage extends StatelessWidget {
       body: ListView.builder(
         itemCount: 50,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text('Item ${index + 1}'),
-            leading: const Icon(Icons.label),
-          );
+          return ListTile(title: Text('Item ${index + 1}'), leading: const Icon(Icons.label));
         },
       ),
       width: 800,
       height: 350,
       onClose: () => Navigator.of(context).pop(),
-      actions: [
-        ElevatedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        ),
-      ],
+      actions: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
     );
   }
 
@@ -456,10 +330,7 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a username';
@@ -471,10 +342,7 @@ class MyHomePage extends StatelessWidget {
               const SizedBox(height: 16),
               TextFormField(
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
                 validator: (value) {
                   if (value == null || value.length < 6) {
                     return 'Password must be at least 6 characters';
@@ -491,16 +359,15 @@ class MyHomePage extends StatelessWidget {
       height: 320,
       onClose: () => Navigator.of(context).pop(),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
         ElevatedButton(
           onPressed: () {
             if (formKey.currentState!.validate()) {
               formKey.currentState!.save();
               // In a real app, you'd use the username and password
-              print('Logging in with $username and $password');
+              if (kDebugMode) {
+                print('Logging in with $username and $password');
+              }
               Navigator.of(context).pop();
             }
           },
@@ -518,11 +385,7 @@ class MyHomePage extends StatelessWidget {
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Please wait while we process your request.'),
-          ],
+          children: [CircularProgressIndicator(), SizedBox(height: 16), Text('Please wait while we process your request.')],
         ),
       ),
       width: 800,
@@ -533,8 +396,9 @@ class MyHomePage extends StatelessWidget {
     );
 
     // Simulate a network call and close the dialog after 3 seconds
+    final navigator = Navigator.of(context, rootNavigator: true);
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context, rootNavigator: true).pop();
+      navigator.pop();
     });
   }
 
@@ -611,40 +475,26 @@ class MyHomePage extends StatelessWidget {
                 return DraggableDialog(
                   onDragUpdate: onDragUpdate,
                   header: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     color: Colors.blueGrey[100],
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Collapsible Dialog',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                         ),
                         Row(
                           children: [
                             IconButton(
-                              icon: Icon(
-                                isCollapsed
-                                    ? Icons.keyboard_arrow_down
-                                    : Icons.keyboard_arrow_up,
-                              ),
+                              icon: Icon(isCollapsed ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
                               onPressed: () {
                                 setState(() {
                                   isCollapsed = !isCollapsed;
                                 });
                               },
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
+                            IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.of(context).pop()),
                           ],
                         ),
                       ],
@@ -654,9 +504,7 @@ class MyHomePage extends StatelessWidget {
                       ? const SizedBox.shrink()
                       : const Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: Text(
-                            'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
-                          ),
+                          child: Text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'),
                         ),
                   footer: isCollapsed
                       ? null
@@ -664,12 +512,7 @@ class MyHomePage extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Close'),
-                              ),
-                            ],
+                            children: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
                           ),
                         ),
                   maxHeight: isCollapsed ? 100 : 200,

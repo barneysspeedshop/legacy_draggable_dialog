@@ -215,9 +215,13 @@ void main() {
   });
   testWidgets('dialog does not move when size equals screen size',
       (WidgetTester tester) async {
-    // Set a fixed screen size
+    // Reset and set a fixed screen size
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -257,8 +261,5 @@ void main() {
     final Dialog dialogAfter = tester.widget(dialogFinder);
     // Should still be center because slack is 0
     expect(dialogAfter.alignment, Alignment.center);
-
-    // Reset screen size
-    addTearDown(tester.view.resetPhysicalSize);
   });
 }

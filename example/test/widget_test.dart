@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:example/main.dart';
 
+class TestAssetBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async {
+    if (key.contains('ink_sparkle.frag')) {
+      // Throwing here forces the framework to gracefully fall back or break the load
+      // chain cleanly before the underlying engine decodes the bad shader version.
+      throw FlutterError('Bypassing shader compilation in test environment.');
+    }
+
+    // Fall back to the default asset manifest binary loader for everything else
+    return rootBundle.load(key);
+  }
+}
+
 void main() {
   setUp(() {
-    final TestWidgetsFlutterBinding binding =
-        TestWidgetsFlutterBinding.ensureInitialized();
-    binding.window.physicalSizeTestValue = const Size(1920, 1080);
-    binding.window.devicePixelRatioTestValue = 1.0;
+    final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+    final view = binding.platformDispatcher.implicitView!;
+    view.physicalSize = const Size(1920, 1080);
+    view.devicePixelRatio = 1.0;
   });
 
   tearDown(() {
-    final TestWidgetsFlutterBinding binding =
-        TestWidgetsFlutterBinding.ensureInitialized();
-    binding.window.clearPhysicalSizeTestValue();
-    binding.window.clearDevicePixelRatioTestValue();
+    final TestWidgetsFlutterBinding binding = TestWidgetsFlutterBinding.ensureInitialized();
+    final view = binding.platformDispatcher.implicitView!;
+    view.resetPhysicalSize();
+    view.resetDevicePixelRatio();
   });
 
-  testWidgets('Draggable Dialog Demo smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our app title is present.
-    expect(find.text('Draggable Dialog Demo'), findsOneWidget);
-  });
-
+  // Inject our custom AssetBundle directly into the widget test architecture
   testWidgets('Simple Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
+
     final buttonFinder = find.text('Show Simple Dialog');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -40,19 +49,44 @@ void main() {
     expect(find.text('Simple Dialog'), findsNothing);
   });
 
-  testWidgets('Simple Dialog with Close Button test', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const MyApp());
-    final buttonFinder = find.text(
-      'Show Simple Dialog With Close Button in Title',
+  testWidgets('Draggable Dialog Demo smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
+
+    expect(find.text('Draggable Dialog Demo'), findsOneWidget);
+  });
+
+  testWidgets('Simple Dialog with InkRipple test', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      DefaultAssetBundle(
+        bundle: TestAssetBundle(),
+        child: Theme(
+          data: ThemeData(useMaterial3: true, splashFactory: InkRipple.splashFactory),
+          child: const MyApp(),
+        ),
+      ),
     );
+
+    final buttonFinder = find.text('Show Simple Dialog');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
     await tester.pumpAndSettle();
 
     expect(find.text('Simple Dialog'), findsOneWidget);
-    // Find the close icon in the header (IconButton)
+    expect(find.text('This is a basic dialog with OK button.'), findsOneWidget);
+
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Simple Dialog'), findsNothing);
+  });
+
+  testWidgets('Simple Dialog with Close Button test', (WidgetTester tester) async {
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
+    final buttonFinder = find.text('Show Simple Dialog With Close Button in Title');
+    await tester.scrollUntilVisible(buttonFinder, 500.0);
+    await tester.tap(buttonFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Simple Dialog'), findsOneWidget);
     expect(find.widgetWithIcon(IconButton, Icons.close), findsOneWidget);
 
     await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
@@ -61,7 +95,7 @@ void main() {
   });
 
   testWidgets('Custom Actions Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Custom Actions');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -83,7 +117,7 @@ void main() {
   });
 
   testWidgets('Custom Footer Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Custom Footer');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -99,7 +133,7 @@ void main() {
   });
 
   testWidgets('Custom Header Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Custom Header');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -114,7 +148,7 @@ void main() {
   });
 
   testWidgets('Dialog with Themed Button test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Themed Button');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -129,7 +163,7 @@ void main() {
   });
 
   testWidgets('Dialog with Danger Theme test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Danger Theme');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -139,9 +173,7 @@ void main() {
     expect(find.text('Delete'), findsOneWidget);
 
     // Verify button color is red (danger)
-    final button = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Delete'),
-    );
+    final button = tester.widget<ElevatedButton>(find.widgetWithText(ElevatedButton, 'Delete'));
     expect(button.style?.backgroundColor?.resolve({}), Colors.red);
 
     await tester.tap(find.text('Delete'));
@@ -150,7 +182,7 @@ void main() {
   });
 
   testWidgets('Dialog with Success Theme test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Success Theme');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -169,7 +201,7 @@ void main() {
   });
 
   testWidgets('Dialog with Custom Buttons test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Custom Buttons');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -186,7 +218,7 @@ void main() {
   });
 
   testWidgets('Scrollable Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Scrollable Body');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -206,7 +238,7 @@ void main() {
   });
 
   testWidgets('Expandable Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Expandable Sections');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -230,7 +262,7 @@ void main() {
   });
 
   testWidgets('Form Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Form');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -244,14 +276,8 @@ void main() {
     expect(find.text('Please enter a username'), findsOneWidget);
 
     // Enter data
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Username'),
-      'testuser',
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Password'),
-      'password123',
-    );
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'testuser');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'password123');
     await tester.pump();
 
     await tester.tap(find.text('Submit'));
@@ -260,12 +286,11 @@ void main() {
   });
 
   testWidgets('Loading Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Loading Dialog');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
-    await tester
-        .pump(); // Just pump, don't settle yet as it might have animation
+    await tester.pump(); // Just pump, don't settle yet as it might have animation
 
     expect(find.text('Processing...'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -276,7 +301,7 @@ void main() {
   });
 
   testWidgets('Tabbed Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Tabs');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -296,7 +321,7 @@ void main() {
   });
 
   testWidgets('Tabbed View Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Dialog with Tabbed View Package');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
@@ -317,41 +342,26 @@ void main() {
   });
 
   testWidgets('Collapsible Dialog test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(DefaultAssetBundle(bundle: TestAssetBundle(), child: const MyApp()));
     final buttonFinder = find.text('Show Collapsible Dialog');
     await tester.scrollUntilVisible(buttonFinder, 500.0);
     await tester.tap(buttonFinder);
     await tester.pumpAndSettle();
 
     expect(find.text('Collapsible Dialog'), findsOneWidget);
-    expect(
-      find.text(
-        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsOneWidget);
 
     // Collapse
     await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
     await tester.pumpAndSettle();
 
     // Body should be gone (SizedBox.shrink) or not found
-    expect(
-      find.text(
-        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
-      ),
-      findsNothing,
-    );
+    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsNothing);
 
     // Expand
     await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
     await tester.pumpAndSettle();
-    expect(
-      find.text(
-        'This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('This is the body of the collapsible dialog. Click the arrow in the header to collapse or expand me.'), findsOneWidget);
 
     // Close
     await tester.tap(find.widgetWithIcon(IconButton, Icons.close));

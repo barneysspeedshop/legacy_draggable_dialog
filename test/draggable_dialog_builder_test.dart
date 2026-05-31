@@ -86,9 +86,13 @@ void main() {
   testWidgets(
       'dragging does not move dialog if width/height equals screen size',
       (WidgetTester tester) async {
-    // Set a fixed screen size for the test
+    // Reset and set a fixed screen size for the test
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -133,16 +137,16 @@ void main() {
 
     // Should not move
     expect(newLocation, equals(initialLocation));
-
-    // Reset window size
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
   });
 
   testWidgets('dragging clamps to screen boundaries',
       (WidgetTester tester) async {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -196,10 +200,6 @@ void main() {
 
     // Should be at the same position (clamped)
     expect(centerAfterSecondDrag, equals(centerAfterFirstDrag));
-
-    // Reset window size
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
   });
 
   testWidgets('dragging works with default size (no width/height provided)',
@@ -293,8 +293,12 @@ void main() {
 
   testWidgets('dragging is disabled if dialog is larger than screen',
       (WidgetTester tester) async {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
     tester.view.physicalSize = const Size(400, 300);
     tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -339,8 +343,5 @@ void main() {
 
     // Should not move because slack is negative (or zero clamped logic effectively)
     expect(newLocation, equals(initialLocation));
-
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
   });
 }

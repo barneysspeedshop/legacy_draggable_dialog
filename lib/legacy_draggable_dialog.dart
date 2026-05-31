@@ -136,6 +136,8 @@ Future<T?> showDraggableDialogWithBuilder<T>({
 }) {
   Alignment currentDialogAlignmentState = initialAlignment;
 
+  final GlobalKey dialogKey = GlobalKey();
+
   return showGeneralDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -146,14 +148,31 @@ Future<T?> showDraggableDialogWithBuilder<T>({
         builder: (builderContext, setState) {
           void handleHeaderPanUpdate(DragUpdateDetails details) {
             final currentScreenSize = MediaQuery.of(builderContext).size;
-            final double modalWidth = width ?? (currentScreenSize.width * 0.8);
-            final double modalHeight =
-                height ?? (currentScreenSize.height * 0.8);
 
-            double halfSlackWidth =
-                (currentScreenSize.width - modalWidth) / 2.0;
-            double halfSlackHeight =
-                (currentScreenSize.height - modalHeight) / 2.0;
+            // Measure actual rendered dialog size so slack is accurate even
+            // when the dialog is smaller than the width/height constraints.
+            Size actualDialogSize = Size(
+              width ?? (currentScreenSize.width * 0.8),
+              height ?? (currentScreenSize.height * 0.8),
+            );
+            final renderBox = dialogKey.currentContext?.findRenderObject()
+                as RenderBox?;
+            if (renderBox != null && renderBox.hasSize) {
+              actualDialogSize = Size(
+                width ?? renderBox.size.width,
+                height ?? renderBox.size.height,
+              );
+            }
+
+            final double effectiveScreenWidth =
+                currentScreenSize.width - insetPadding.horizontal;
+            final double effectiveScreenHeight =
+                currentScreenSize.height - insetPadding.vertical;
+
+            final double halfSlackWidth =
+                (effectiveScreenWidth - actualDialogSize.width) / 2.0;
+            final double halfSlackHeight =
+                (effectiveScreenHeight - actualDialogSize.height) / 2.0;
 
             double dAlignX = 0;
             if (halfSlackWidth > 1e-6) {
@@ -179,7 +198,10 @@ Future<T?> showDraggableDialogWithBuilder<T>({
             insetPadding: insetPadding,
             backgroundColor: Colors.transparent,
             elevation: 0, // Elevation is on the Material child
-            child: builder(builderContext, handleHeaderPanUpdate),
+            child: KeyedSubtree(
+              key: dialogKey,
+              child: builder(builderContext, handleHeaderPanUpdate),
+            ),
           );
         },
       );

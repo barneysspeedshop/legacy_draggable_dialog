@@ -148,7 +148,7 @@ class DraggableDialog extends StatelessWidget {
   }
 
   Widget _buildBody(DraggableDialogThemeData dialogTheme) {
-    final bodyContainer = Container(
+    final bodyContainer = Material(
       color: dialogTheme.contentColor,
       child: body,
     );
