@@ -371,7 +371,7 @@ class DialogFooter extends StatelessWidget {
                 child: Icon(
                   resizeHandleIcon,
                   size: resizeHandleIconSize ?? theme.buttonTextSize ?? 18,
-                  color: theme.buttonColor?.withOpacity(0.5) ?? Colors.grey,
+                  color: theme.buttonColor?.withValues(alpha: 0.5) ?? Colors.grey,
                 ),
               ),
             ),

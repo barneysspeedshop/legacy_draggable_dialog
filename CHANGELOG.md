@@ -1,3 +1,7 @@
+## 0.1.1
+
+* **FIX**: Replace deprecated `Color.withOpacity` with `withValues` for the resize handle icon.
+
 ## 0.1.0
 
 * **FEATURE**: Add optional dialog resizing via a footer drag handle (`resizable`, `resizeHandleIcon`, `resizeHandleIconSize`).
