@@ -29,6 +29,16 @@ Future<T?> showLegacyDraggableDialog<T>({
   double? width,
   double? height,
   double? maxHeight,
+  double? headerHeight,
+  double? footerHeight,
+  double? buttonHeight,
+  double? buttonMinWidth,
+  double? buttonTextSize,
+  double? headerTextSize,
+  double? closeIconSize,
+  TextStyle? titleStyle,
+  Color? closeIconColor,
+  Color? buttonColor,
   bool expandContent = true,
   Alignment initialAlignment = Alignment.center,
   bool barrierDismissible = true,
@@ -57,21 +67,57 @@ Future<T?> showLegacyDraggableDialog<T>({
     barrierColor: barrierColor,
     insetPadding: insetPadding,
     builder: (dialogContext, onDragUpdate) {
-      final dialogTheme = theme ?? DraggableDialogThemeData.from(dialogContext);
+      final dialogTheme = (theme ?? DraggableDialogThemeData.from(dialogContext)).copyWith(
+        headerHeight: headerHeight,
+        footerHeight: footerHeight,
+        buttonHeight: buttonHeight,
+        buttonMinWidth: buttonMinWidth,
+        buttonTextSize: buttonTextSize,
+        buttonColor: buttonColor,
+        headerTextSize: headerTextSize,
+        closeIconSize: closeIconSize,
+        titleStyle: titleStyle,
+        closeIconColor: closeIconColor,
+      );
 
       // Default Header
+      final double? effectiveHeaderTextSize = dialogTheme.headerTextSize ??
+          (dialogTheme.headerHeight != null
+              ? dialogTheme.headerHeight! * 0.35
+              : null);
+
+      final double? effectiveCloseIconSize = dialogTheme.closeIconSize ??
+          (dialogTheme.headerHeight != null
+              ? dialogTheme.headerHeight! * 0.5
+              : null);
+
       final Widget effectiveHeader = header ??
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: dialogTheme.headerHeight == null ? 8.0 : 0.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(title, style: dialogTheme.titleStyle),
+                Expanded(
+                  child: Text(title,
+                      style: (dialogTheme.titleStyle ?? const TextStyle())
+                          .copyWith(fontSize: effectiveHeaderTextSize),
+                      overflow: TextOverflow.ellipsis),
+                ),
                 if (onClose != null)
                   IconButton(
-                      icon: const Icon(Icons.close),
+                      iconSize: effectiveCloseIconSize,
+                      icon: Icon(
+                        Icons.close,
+                        color: dialogTheme.closeIconColor ??
+                            dialogTheme.titleStyle?.color,
+                      ),
                       onPressed: onClose,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                       tooltip: 'Close'),
               ],
             ),
