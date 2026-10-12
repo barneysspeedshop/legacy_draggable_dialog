@@ -29,15 +29,45 @@ Future<T?> showLegacyDraggableDialog<T>({
   double? width,
   double? height,
   double? maxHeight,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? headerHeight,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? footerHeight,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? buttonHeight,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? buttonMinWidth,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? buttonTextSize,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? headerTextSize,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   double? closeIconSize,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   TextStyle? titleStyle,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   Color? closeIconColor,
+  @Deprecated(
+    'Set this on DraggableDialogThemeData instead. This argument still overrides theme.',
+  )
   Color? buttonColor,
   bool expandContent = true,
   Alignment initialAlignment = Alignment.center,
@@ -45,11 +75,19 @@ Future<T?> showLegacyDraggableDialog<T>({
   Color barrierColor = Colors.black54,
   EdgeInsets insetPadding = const EdgeInsets.all(10.0),
   DraggableDialogThemeData? theme,
+  bool useRootNavigator = true,
+  RouteSettings? routeSettings,
+  RouteTransitionsBuilder? transitionBuilder,
+  bool scrollable = true,
+  bool resizable = false,
+  IconData? resizeHandleIcon,
+  double? resizeHandleIconSize,
+  bool showHeader = true,
 }) {
   final bool hasClosingMechanism = onClose != null ||
       onOk != null ||
       onCancel != null ||
-      header != null ||
+      (showHeader && header != null) ||
       footer != null ||
       (actions != null && actions.isNotEmpty);
 
@@ -66,8 +104,12 @@ Future<T?> showLegacyDraggableDialog<T>({
     barrierDismissible: barrierDismissible,
     barrierColor: barrierColor,
     insetPadding: insetPadding,
+    useRootNavigator: useRootNavigator,
+    routeSettings: routeSettings,
+    transitionBuilder: transitionBuilder,
     builder: (dialogContext, onDragUpdate) {
-      final dialogTheme = (theme ?? DraggableDialogThemeData.from(dialogContext)).copyWith(
+      final dialogTheme =
+          (theme ?? DraggableDialogThemeData.from(dialogContext)).copyWith(
         headerHeight: headerHeight,
         footerHeight: footerHeight,
         buttonHeight: buttonHeight,
@@ -80,48 +122,64 @@ Future<T?> showLegacyDraggableDialog<T>({
         closeIconColor: closeIconColor,
       );
 
-      // Default Header
-      final double? effectiveHeaderTextSize = dialogTheme.headerTextSize ??
-          (dialogTheme.headerHeight != null
-              ? dialogTheme.headerHeight! * 0.35
-              : null);
+      final Widget? effectiveHeader;
+      final bool dragEntireHeader;
+      if (!showHeader) {
+        effectiveHeader = null;
+        dragEntireHeader = true;
+      } else if (header != null) {
+        effectiveHeader = header;
+        dragEntireHeader = true;
+      } else {
+        dragEntireHeader = false;
+        final double? effectiveHeaderTextSize = dialogTheme.headerTextSize ??
+            (dialogTheme.headerHeight != null
+                ? dialogTheme.headerHeight! * 0.35
+                : null);
 
-      final double? effectiveCloseIconSize = dialogTheme.closeIconSize ??
-          (dialogTheme.headerHeight != null
-              ? dialogTheme.headerHeight! * 0.5
-              : null);
+        final double? effectiveCloseIconSize = dialogTheme.closeIconSize ??
+            (dialogTheme.headerHeight != null
+                ? dialogTheme.headerHeight! * 0.5
+                : null);
 
-      final Widget effectiveHeader = header ??
-          Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: dialogTheme.headerHeight == null ? 8.0 : 0.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(title,
-                      style: (dialogTheme.titleStyle ?? const TextStyle())
-                          .copyWith(fontSize: effectiveHeaderTextSize),
-                      overflow: TextOverflow.ellipsis),
+        effectiveHeader = Container(
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: dialogTheme.headerHeight == null ? 8.0 : 0.0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanUpdate: onDragUpdate,
+                  child: Text(
+                    title,
+                    style: (dialogTheme.titleStyle ?? const TextStyle())
+                        .copyWith(fontSize: effectiveHeaderTextSize),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                if (onClose != null)
-                  IconButton(
-                      iconSize: effectiveCloseIconSize,
-                      icon: Icon(
-                        Icons.close,
-                        color: dialogTheme.closeIconColor ??
-                            dialogTheme.titleStyle?.color,
-                      ),
-                      onPressed: onClose,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      tooltip: 'Close'),
-              ],
-            ),
-          );
+              ),
+              if (onClose != null)
+                IconButton(
+                  iconSize: effectiveCloseIconSize,
+                  icon: Icon(
+                    Icons.close,
+                    color: dialogTheme.closeIconColor ??
+                        dialogTheme.titleStyle?.color,
+                  ),
+                  onPressed: onClose,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Close',
+                ),
+            ],
+          ),
+        );
+      }
 
       // Default Footer
       Widget? effectiveFooter;
@@ -151,12 +209,17 @@ Future<T?> showLegacyDraggableDialog<T>({
       return DraggableDialog(
         onDragUpdate: onDragUpdate,
         header: effectiveHeader,
+        dragEntireHeader: dragEntireHeader,
         body: body,
         footer: effectiveFooter,
         width: width,
         maxHeight: maxHeight,
         expandContent: expandContent,
         theme: dialogTheme,
+        scrollable: scrollable,
+        resizable: resizable,
+        resizeHandleIcon: resizeHandleIcon,
+        resizeHandleIconSize: resizeHandleIconSize,
       );
     },
   );
@@ -179,6 +242,9 @@ Future<T?> showDraggableDialogWithBuilder<T>({
   bool barrierDismissible = true,
   Color barrierColor = Colors.black54,
   EdgeInsets insetPadding = const EdgeInsets.all(10.0),
+  bool useRootNavigator = true,
+  RouteSettings? routeSettings,
+  RouteTransitionsBuilder? transitionBuilder,
 }) {
   Alignment currentDialogAlignmentState = initialAlignment;
 
@@ -186,6 +252,9 @@ Future<T?> showDraggableDialogWithBuilder<T>({
 
   return showGeneralDialog<T>(
     context: context,
+    useRootNavigator: useRootNavigator,
+    routeSettings: routeSettings,
+    transitionBuilder: transitionBuilder,
     barrierDismissible: barrierDismissible,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: barrierColor,
@@ -201,8 +270,8 @@ Future<T?> showDraggableDialogWithBuilder<T>({
               width ?? (currentScreenSize.width * 0.8),
               height ?? (currentScreenSize.height * 0.8),
             );
-            final renderBox = dialogKey.currentContext?.findRenderObject()
-                as RenderBox?;
+            final renderBox =
+                dialogKey.currentContext?.findRenderObject() as RenderBox?;
             if (renderBox != null && renderBox.hasSize) {
               actualDialogSize = Size(
                 width ?? renderBox.size.width,

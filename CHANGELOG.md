@@ -1,3 +1,13 @@
+## 0.1.2
+
+* **FEATURE**: `DraggableDialogThemeData` now extends `ThemeExtension`. Add it to `ThemeData.extensions`. `DraggableDialogThemeData.from` overlays that extension, and null fields keep the built-in light and dark values.
+* **FEATURE**: Add optional theme fields `shape`, `elevation`, `minWidth`, and `minHeight`.
+* **FEATURE**: `showLegacyDraggableDialog` and `showDraggableDialogWithBuilder` take optional `useRootNavigator`, `routeSettings`, and `transitionBuilder`.
+* **FEATURE**: `showLegacyDraggableDialog` takes optional `scrollable`, `resizable`, `resizeHandleIcon`, `resizeHandleIconSize`, and `showHeader`.
+* **FEATURE**: `DraggableDialog` takes `dragEntireHeader`. The default header drags from the title, so the close button no longer moves the dialog. Custom headers still drag as a whole.
+* **FEATURE**: `resizable` adds a resize handle for any footer, including footers that are not a `DialogFooter`.
+* **DEPRECATION**: On `showLegacyDraggableDialog`, `headerHeight`, `footerHeight`, `buttonHeight`, `buttonMinWidth`, `buttonTextSize`, `headerTextSize`, `closeIconSize`, `titleStyle`, `closeIconColor`, and `buttonColor` are deprecated. Set them on `DraggableDialogThemeData`. A non-null argument still overrides `theme`.
+
 ## 0.1.1
 
 * **FIX**: Replace deprecated `Color.withOpacity` with `withValues` for the resize handle icon.

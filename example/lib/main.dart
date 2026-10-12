@@ -272,6 +272,7 @@ class MyHomePage extends StatelessWidget {
       ),
       width: 800,
       height: 350,
+      scrollable: false,
       onClose: () => Navigator.of(context).pop(),
       actions: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
     );
@@ -311,6 +312,7 @@ class MyHomePage extends StatelessWidget {
       ),
       width: 800,
       height: 400,
+      scrollable: false,
       onClose: () => Navigator.of(context).pop(),
     );
   }
@@ -427,6 +429,7 @@ class MyHomePage extends StatelessWidget {
       ),
       width: 450,
       height: 300,
+      scrollable: false,
       onClose: () => Navigator.of(context).pop(),
     );
   }
@@ -457,6 +460,7 @@ class MyHomePage extends StatelessWidget {
       ),
       width: 800,
       height: 350,
+      scrollable: false,
       onClose: () => Navigator.of(context).pop(),
     );
   }
@@ -480,9 +484,12 @@ class MyHomePage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Collapsible Dialog',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                        const Expanded(
+                          child: Text(
+                            'Collapsible Dialog',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                          ),
                         ),
                         Row(
                           children: [

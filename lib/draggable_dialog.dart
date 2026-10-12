@@ -1,8 +1,15 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 
 /// A theme to customize the appearance of the [DraggableDialog].
+///
+/// Set it on [ThemeData.extensions] or pass it as [DraggableDialog.theme].
+/// [DraggableDialogThemeData.from] reads the extension and keeps built-in
+/// values for fields left null.
 @immutable
-class DraggableDialogThemeData {
+class DraggableDialogThemeData
+    extends ThemeExtension<DraggableDialogThemeData> {
   final Color? headerColor;
   final Color? contentColor;
   final Color? footerColor;
@@ -18,6 +25,10 @@ class DraggableDialogThemeData {
   final double? headerTextSize;
   final double? closeIconSize;
   final Color? closeIconColor;
+  final ShapeBorder? shape;
+  final double? elevation;
+  final double? minWidth;
+  final double? minHeight;
 
   const DraggableDialogThemeData({
     this.headerColor,
@@ -35,9 +46,14 @@ class DraggableDialogThemeData {
     this.headerTextSize,
     this.closeIconSize,
     this.closeIconColor,
-  });
+    this.shape,
+    this.elevation,
+    this.minWidth,
+    this.minHeight,
+  }) : super();
 
   /// Creates a copy of this theme with the given fields replaced by the new values.
+  @override
   DraggableDialogThemeData copyWith({
     Color? headerColor,
     Color? contentColor,
@@ -54,6 +70,10 @@ class DraggableDialogThemeData {
     double? headerTextSize,
     double? closeIconSize,
     Color? closeIconColor,
+    ShapeBorder? shape,
+    double? elevation,
+    double? minWidth,
+    double? minHeight,
   }) {
     return DraggableDialogThemeData(
       headerColor: headerColor ?? this.headerColor,
@@ -71,15 +91,54 @@ class DraggableDialogThemeData {
       headerTextSize: headerTextSize ?? this.headerTextSize,
       closeIconSize: closeIconSize ?? this.closeIconSize,
       closeIconColor: closeIconColor ?? this.closeIconColor,
+      shape: shape ?? this.shape,
+      elevation: elevation ?? this.elevation,
+      minWidth: minWidth ?? this.minWidth,
+      minHeight: minHeight ?? this.minHeight,
+    );
+  }
+
+  @override
+  DraggableDialogThemeData lerp(
+    ThemeExtension<DraggableDialogThemeData>? other,
+    double t,
+  ) {
+    if (other is! DraggableDialogThemeData) {
+      return this;
+    }
+    return DraggableDialogThemeData(
+      headerColor: Color.lerp(headerColor, other.headerColor, t),
+      contentColor: Color.lerp(contentColor, other.contentColor, t),
+      footerColor: Color.lerp(footerColor, other.footerColor, t),
+      titleStyle: TextStyle.lerp(titleStyle, other.titleStyle, t),
+      buttonColor: Color.lerp(buttonColor, other.buttonColor, t),
+      buttonStyle: ButtonStyle.lerp(buttonStyle, other.buttonStyle, t),
+      buttonTextStyle:
+          TextStyle.lerp(buttonTextStyle, other.buttonTextStyle, t),
+      headerHeight: lerpDouble(headerHeight, other.headerHeight, t),
+      footerHeight: lerpDouble(footerHeight, other.footerHeight, t),
+      buttonHeight: lerpDouble(buttonHeight, other.buttonHeight, t),
+      buttonMinWidth: lerpDouble(buttonMinWidth, other.buttonMinWidth, t),
+      buttonTextSize: lerpDouble(buttonTextSize, other.buttonTextSize, t),
+      headerTextSize: lerpDouble(headerTextSize, other.headerTextSize, t),
+      closeIconSize: lerpDouble(closeIconSize, other.closeIconSize, t),
+      closeIconColor: Color.lerp(closeIconColor, other.closeIconColor, t),
+      shape: ShapeBorder.lerp(shape, other.shape, t),
+      elevation: lerpDouble(elevation, other.elevation, t),
+      minWidth: lerpDouble(minWidth, other.minWidth, t),
+      minHeight: lerpDouble(minHeight, other.minHeight, t),
     );
   }
 
   /// Creates a default theme for the dialog based on the current [ThemeData].
+  ///
+  /// When [ThemeData.extensions] contains a [DraggableDialogThemeData], its
+  /// non-null fields replace the built-in light or dark values.
   factory DraggableDialogThemeData.from(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    return isDarkMode
+    final base = isDarkMode
         ? DraggableDialogThemeData(
             headerColor: Colors.grey[800],
             contentColor: const Color(0xFF202020),
@@ -106,6 +165,32 @@ class DraggableDialogThemeData {
             buttonTextStyle:
                 theme.textTheme.labelLarge?.copyWith(color: Colors.white),
           );
+
+    final themeExtension = theme.extension<DraggableDialogThemeData>();
+    if (themeExtension == null) {
+      return base;
+    }
+    return base.copyWith(
+      headerColor: themeExtension.headerColor,
+      contentColor: themeExtension.contentColor,
+      footerColor: themeExtension.footerColor,
+      titleStyle: themeExtension.titleStyle,
+      buttonColor: themeExtension.buttonColor,
+      buttonStyle: themeExtension.buttonStyle,
+      buttonTextStyle: themeExtension.buttonTextStyle,
+      headerHeight: themeExtension.headerHeight,
+      footerHeight: themeExtension.footerHeight,
+      buttonHeight: themeExtension.buttonHeight,
+      buttonMinWidth: themeExtension.buttonMinWidth,
+      buttonTextSize: themeExtension.buttonTextSize,
+      headerTextSize: themeExtension.headerTextSize,
+      closeIconSize: themeExtension.closeIconSize,
+      closeIconColor: themeExtension.closeIconColor,
+      shape: themeExtension.shape,
+      elevation: themeExtension.elevation,
+      minWidth: themeExtension.minWidth,
+      minHeight: themeExtension.minHeight,
+    );
   }
 }
 
@@ -115,8 +200,15 @@ class DraggableDialogThemeData {
 /// each of which can be replaced with a custom widget.
 class DraggableDialog extends StatefulWidget {
   /// The widget to display in the header. If null, the header is not shown.
-  /// The header is the draggable area of the dialog.
+  ///
+  /// When [dragEntireHeader] is true, the header container is the drag target.
   final Widget? header;
+
+  /// When true, a pan on the header container drags the dialog.
+  ///
+  /// When false, the header is not wrapped in a [GestureDetector]. Place
+  /// [onDragUpdate] on the part of [header] that should drag.
+  final bool dragEntireHeader;
 
   /// The main content of the dialog. This is the only required part.
   final Widget body;
@@ -154,12 +246,14 @@ class DraggableDialog extends StatefulWidget {
 
   /// Icon shown as the resize handle when [resizable] is enabled.
   ///
-  /// If null, the value from [DialogFooter] is used.
+  /// When null, a [DialogFooter] keeps its own icon and any other footer uses
+  /// [Icons.drag_handle].
   final IconData? resizeHandleIcon;
 
   /// Size of the resize handle icon when [resizable] is enabled.
   ///
-  /// If null, the value from [DialogFooter] is used.
+  /// When null, a [DialogFooter] keeps its own size and any other footer uses
+  /// [DraggableDialogThemeData.buttonTextSize] or 18.
   final double? resizeHandleIconSize;
 
   const DraggableDialog({
@@ -167,6 +261,7 @@ class DraggableDialog extends StatefulWidget {
     required this.body,
     required this.onDragUpdate,
     this.header,
+    this.dragEntireHeader = true,
     this.footer,
     this.width,
     this.height,
@@ -209,16 +304,23 @@ class _DraggableDialogState extends State<DraggableDialog> {
     final baseWidth = widget.width ?? 400.0;
     final baseHeight = widget.height ?? widget.maxHeight ?? screenHeight * 0.85;
 
-    final effectiveWidth = (baseWidth + _widthOffset).clamp(200.0, double.infinity);
-    final effectiveHeight = (baseHeight + _heightOffset).clamp(150.0, screenHeight);
+    final effectiveWidth = (baseWidth + _widthOffset).clamp(
+      dialogTheme.minWidth ?? 200.0,
+      double.infinity,
+    );
+    final effectiveHeight = (baseHeight + _heightOffset).clamp(
+      dialogTheme.minHeight ?? 150.0,
+      screenHeight,
+    );
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: effectiveHeight),
       child: Material(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
+        elevation: dialogTheme.elevation ?? 4.0,
+        shape: dialogTheme.shape ??
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
         clipBehavior: Clip.antiAlias,
         child: SizedBox(
           width: effectiveWidth,
@@ -226,16 +328,7 @@ class _DraggableDialogState extends State<DraggableDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header
-              if (widget.header != null)
-                GestureDetector(
-                  onPanUpdate: widget.onDragUpdate,
-                  child: Container(
-                    height: dialogTheme.headerHeight,
-                    color: dialogTheme.headerColor,
-                    child: widget.header,
-                  ),
-                ),
+              if (widget.header != null) _buildHeader(dialogTheme),
 
               // Body
               _buildBody(dialogTheme),
@@ -254,9 +347,25 @@ class _DraggableDialogState extends State<DraggableDialog> {
     );
   }
 
+  Widget _buildHeader(DraggableDialogThemeData dialogTheme) {
+    final coloredHeader = Container(
+      height: dialogTheme.headerHeight,
+      color: dialogTheme.headerColor,
+      child: widget.header,
+    );
+    if (!widget.dragEntireHeader) {
+      return coloredHeader;
+    }
+    return GestureDetector(
+      onPanUpdate: widget.onDragUpdate,
+      child: coloredHeader,
+    );
+  }
+
   Widget _buildBody(DraggableDialogThemeData dialogTheme) {
     if (!widget.scrollable) {
-      final content = Material(color: dialogTheme.contentColor, child: widget.body);
+      final content =
+          Material(color: dialogTheme.contentColor, child: widget.body);
       return widget.expandContent ? Expanded(child: content) : content;
     }
 
@@ -293,8 +402,11 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
   Widget _buildFooter(DraggableDialogThemeData dialogTheme) {
     final footerWidget = widget.footer!;
+    if (!widget.resizable) {
+      return footerWidget;
+    }
 
-    if (widget.resizable && footerWidget is DialogFooter) {
+    if (footerWidget is DialogFooter) {
       return DialogFooter(
         onOk: footerWidget.onOk,
         onCancel: footerWidget.onCancel,
@@ -302,12 +414,24 @@ class _DraggableDialogState extends State<DraggableDialog> {
         cancelText: footerWidget.cancelText,
         theme: footerWidget.theme,
         onResizeUpdate: _handleResize,
-        resizeHandleIcon: widget.resizeHandleIcon ?? footerWidget.resizeHandleIcon,
-        resizeHandleIconSize: widget.resizeHandleIconSize ?? footerWidget.resizeHandleIconSize,
+        resizeHandleIcon:
+            widget.resizeHandleIcon ?? footerWidget.resizeHandleIcon,
+        resizeHandleIconSize:
+            widget.resizeHandleIconSize ?? footerWidget.resizeHandleIconSize,
       );
     }
 
-    return footerWidget;
+    return Row(
+      children: [
+        _ResizeHandle(
+          onResizeUpdate: _handleResize,
+          icon: widget.resizeHandleIcon ?? Icons.drag_handle,
+          size: widget.resizeHandleIconSize ?? dialogTheme.buttonTextSize ?? 18,
+          color: dialogTheme.buttonColor?.withValues(alpha: 0.5) ?? Colors.grey,
+        ),
+        Expanded(child: footerWidget),
+      ],
+    );
   }
 }
 
@@ -339,14 +463,16 @@ class DialogFooter extends StatelessWidget {
     // Resolve button style with height, width, and color constraints
     ButtonStyle? effectiveButtonStyle = theme.buttonStyle;
     if (theme.buttonHeight != null || theme.buttonMinWidth != null) {
-      effectiveButtonStyle = (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
+      effectiveButtonStyle =
+          (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
         minimumSize: WidgetStateProperty.all(
           Size(theme.buttonMinWidth ?? 0, theme.buttonHeight ?? 0),
         ),
       );
     }
     if (theme.buttonColor != null) {
-      effectiveButtonStyle = (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
+      effectiveButtonStyle =
+          (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
         backgroundColor: WidgetStateProperty.all(theme.buttonColor),
       );
     }
@@ -354,7 +480,8 @@ class DialogFooter extends StatelessWidget {
     // Resolve button text style with text size
     TextStyle? effectiveButtonTextStyle = theme.buttonTextStyle;
     if (theme.buttonTextSize != null) {
-      effectiveButtonTextStyle = (effectiveButtonTextStyle ?? const TextStyle()).copyWith(
+      effectiveButtonTextStyle =
+          (effectiveButtonTextStyle ?? const TextStyle()).copyWith(
         fontSize: theme.buttonTextSize,
       );
     }
@@ -364,16 +491,11 @@ class DialogFooter extends StatelessWidget {
       child: Row(
         children: [
           if (onResizeUpdate != null)
-            GestureDetector(
-              onPanUpdate: onResizeUpdate,
-              child: MouseRegion(
-                cursor: SystemMouseCursors.resizeDownRight,
-                child: Icon(
-                  resizeHandleIcon,
-                  size: resizeHandleIconSize ?? theme.buttonTextSize ?? 18,
-                  color: theme.buttonColor?.withValues(alpha: 0.5) ?? Colors.grey,
-                ),
-              ),
+            _ResizeHandle(
+              onResizeUpdate: onResizeUpdate!,
+              icon: resizeHandleIcon,
+              size: resizeHandleIconSize ?? theme.buttonTextSize ?? 18,
+              color: theme.buttonColor?.withValues(alpha: 0.5) ?? Colors.grey,
             ),
           const Spacer(),
           if (onCancel != null)
@@ -395,6 +517,31 @@ class DialogFooter extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _ResizeHandle extends StatelessWidget {
+  const _ResizeHandle({
+    required this.onResizeUpdate,
+    required this.icon,
+    required this.size,
+    required this.color,
+  });
+
+  final void Function(DragUpdateDetails) onResizeUpdate;
+  final IconData icon;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onPanUpdate: onResizeUpdate,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.resizeDownRight,
+        child: Icon(icon, size: size, color: color),
       ),
     );
   }
