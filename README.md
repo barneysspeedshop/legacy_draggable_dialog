@@ -12,7 +12,7 @@ Add this dependency to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  legacy_draggable_dialog: ^0.1.2
+  legacy_draggable_dialog: ^0.2.0
 ```
 
 ## Show a dialog
@@ -46,4 +46,4 @@ MaterialApp(
 
 You can still pass `theme` on one call. Older arguments such as `buttonColor` and `headerHeight` still override `theme`. Set those fields on `DraggableDialogThemeData` instead.
 
-For a fully custom shell, call `showDraggableDialogWithBuilder` and pass `onDragUpdate` to the widget that should drag.
+For a fully custom shell, call `showDraggableDialogWithBuilder` and pass `onDragUpdate` to the widget that should drag. The route stores position in pixels so drag speed stays 1:1 with the pointer. Custom chrome can read `ResizeHandleProvider` for left and right resize handles and to report a content-height ceiling. Set `intrinsicHeight` when the dialog should size to its child until the first resize.

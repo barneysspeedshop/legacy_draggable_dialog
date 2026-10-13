@@ -1,3 +1,11 @@
+## 0.2.0
+
+* **BREAKING**: `showDraggableDialogWithBuilder` positions the dialog with pixel `Offset`s instead of `Dialog.alignment`. Drag and resize stay 1:1 with the pointer, including when dialog content is scaled.
+* **FEATURE**: `ResizeHandleProvider` exposes drag, left resize, right resize, and content-height callbacks to custom chrome.
+* **FEATURE**: `showDraggableDialogWithBuilder` takes optional `intrinsicHeight` and `onResizeUpdate`.
+* **FEATURE**: The route clamps to view padding, view insets, and `insetPadding`, and shrinks an oversized dialog to fit.
+* **FIX**: `showLegacyDraggableDialog` forwards `height` to `DraggableDialog`.
+
 ## 0.1.2
 
 * **FEATURE**: `DraggableDialogThemeData` now extends `ThemeExtension`. Add it to `ThemeData.extensions`. `DraggableDialogThemeData.from` overlays that extension, and null fields keep the built-in light and dark values.

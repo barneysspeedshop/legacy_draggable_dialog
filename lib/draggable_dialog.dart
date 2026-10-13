@@ -2,6 +2,52 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
+typedef DragUpdateCallback = void Function(DragUpdateDetails details);
+
+/// Provides drag, resize, and content-height callbacks to dialog chrome.
+class ResizeHandleProvider extends InheritedWidget {
+  final DragUpdateCallback? onResizeUpdate;
+  final DragUpdateCallback? onResizeLeftUpdate;
+  final DragUpdateCallback? onDragUpdate;
+  final ValueChanged<double?>? onContentHeightChanged;
+
+  const ResizeHandleProvider({
+    super.key,
+    required this.onResizeUpdate,
+    this.onResizeLeftUpdate,
+    this.onDragUpdate,
+    this.onContentHeightChanged,
+    required super.child,
+  });
+
+  static DragUpdateCallback? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ResizeHandleProvider>()
+        ?.onResizeUpdate;
+  }
+
+  static DragUpdateCallback? leftOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ResizeHandleProvider>()
+        ?.onResizeLeftUpdate;
+  }
+
+  static DragUpdateCallback? dragOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<ResizeHandleProvider>()
+      ?.onDragUpdate;
+
+  static ValueChanged<double?>? contentHeightOf(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<ResizeHandleProvider>()
+      ?.onContentHeightChanged;
+
+  @override
+  bool updateShouldNotify(ResizeHandleProvider oldWidget) =>
+      onResizeUpdate != oldWidget.onResizeUpdate ||
+      onResizeLeftUpdate != oldWidget.onResizeLeftUpdate ||
+      onDragUpdate != oldWidget.onDragUpdate ||
+      onContentHeightChanged != oldWidget.onContentHeightChanged;
+}
+
 /// A theme to customize the appearance of the [DraggableDialog].
 ///
 /// Set it on [ThemeData.extensions] or pass it as [DraggableDialog.theme].
@@ -284,6 +330,11 @@ class _DraggableDialogState extends State<DraggableDialog> {
   double _heightOffset = 0;
 
   void _handleResize(DragUpdateDetails details) {
+    final provided = ResizeHandleProvider.leftOf(context);
+    if (provided != null) {
+      provided(details);
+      return;
+    }
     setState(() {
       _widthOffset -= details.delta.dx;
       _heightOffset += details.delta.dy;
@@ -298,52 +349,65 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final dialogTheme = widget.theme ?? DraggableDialogThemeData.from(context);
-    final screenHeight = MediaQuery.of(context).size.height;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final dialogTheme =
+            widget.theme ?? DraggableDialogThemeData.from(context);
+        final screenHeight = MediaQuery.of(context).size.height;
+        final baseWidth = constraints.hasTightWidth
+            ? constraints.maxWidth
+            : widget.width ?? 400.0;
+        final baseHeight = constraints.hasTightHeight
+            ? constraints.maxHeight
+            : widget.height ?? widget.maxHeight ?? screenHeight * 0.85;
 
-    final baseWidth = widget.width ?? 400.0;
-    final baseHeight = widget.height ?? widget.maxHeight ?? screenHeight * 0.85;
+        final maxWidth =
+            constraints.hasBoundedWidth && constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : double.infinity;
+        final maxHeight =
+            constraints.hasBoundedHeight && constraints.maxHeight.isFinite
+                ? constraints.maxHeight
+                : screenHeight;
 
-    final effectiveWidth = (baseWidth + _widthOffset).clamp(
-      dialogTheme.minWidth ?? 200.0,
-      double.infinity,
-    );
-    final effectiveHeight = (baseHeight + _heightOffset).clamp(
-      dialogTheme.minHeight ?? 150.0,
-      screenHeight,
-    );
+        final effectiveWidth = (baseWidth + _widthOffset).clamp(
+          dialogTheme.minWidth ?? 200.0,
+          maxWidth,
+        );
+        final effectiveHeight = (baseHeight + _heightOffset).clamp(
+          dialogTheme.minHeight ?? 150.0,
+          maxHeight,
+        );
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: effectiveHeight),
-      child: Material(
-        elevation: dialogTheme.elevation ?? 4.0,
-        shape: dialogTheme.shape ??
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-        clipBehavior: Clip.antiAlias,
-        child: SizedBox(
-          width: effectiveWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.header != null) _buildHeader(dialogTheme),
-
-              // Body
-              _buildBody(dialogTheme),
-
-              // Footer
-              if (widget.footer != null)
-                Container(
-                  height: dialogTheme.footerHeight,
-                  color: dialogTheme.footerColor,
-                  child: _buildFooter(dialogTheme),
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: effectiveHeight),
+          child: Material(
+            elevation: dialogTheme.elevation ?? 4.0,
+            shape: dialogTheme.shape ??
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-            ],
+            clipBehavior: Clip.antiAlias,
+            child: SizedBox(
+              width: effectiveWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (widget.header != null) _buildHeader(dialogTheme),
+                  _buildBody(dialogTheme),
+                  if (widget.footer != null)
+                    Container(
+                      height: dialogTheme.footerHeight,
+                      color: dialogTheme.footerColor,
+                      child: _buildFooter(dialogTheme),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

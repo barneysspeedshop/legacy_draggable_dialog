@@ -1,6 +1,10 @@
-// lib/widgets/dialogs/draggable_dialog_helper.dart
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:legacy_draggable_dialog/draggable_dialog.dart';
+
+export 'package:legacy_draggable_dialog/draggable_dialog.dart'
+    show DragUpdateCallback, ResizeHandleProvider;
 
 /// Shows a highly customizable draggable dialog with a default layout.
 ///
@@ -98,7 +102,7 @@ Future<T?> showLegacyDraggableDialog<T>({
 
   return showDraggableDialogWithBuilder<T>(
     context: context,
-    width: width,
+    width: width ?? 400,
     height: height,
     initialAlignment: initialAlignment,
     barrierDismissible: barrierDismissible,
@@ -213,6 +217,7 @@ Future<T?> showLegacyDraggableDialog<T>({
         body: body,
         footer: effectiveFooter,
         width: width,
+        height: height,
         maxHeight: maxHeight,
         expandContent: expandContent,
         theme: dialogTheme,
@@ -227,29 +232,27 @@ Future<T?> showLegacyDraggableDialog<T>({
 
 /// A generic helper to show a dialog that can be dragged around the screen.
 ///
-/// This function provides the core dragging logic but allows the caller to define
-/// the entire UI of the dialog via a `builder` function. The builder receives an
-/// `onDragUpdate` handler that should be passed to a `GestureDetector` on the
-/// part of the UI that will act as the drag handle.
+/// Position is stored in pixels so drag and resize stay 1:1 with the pointer,
+/// including when the dialog content is scaled. The builder receives an
+/// `onDragUpdate` handler for the drag handle. Custom chrome can also read
+/// [ResizeHandleProvider] for left/right resize and content-height reporting.
 Future<T?> showDraggableDialogWithBuilder<T>({
   required BuildContext context,
   required Widget Function(
           BuildContext context, void Function(DragUpdateDetails) onDragUpdate)
       builder,
+  void Function(DragUpdateDetails)? onResizeUpdate,
   double? width,
   double? height,
   Alignment initialAlignment = Alignment.center,
   bool barrierDismissible = true,
   Color barrierColor = Colors.black54,
+  bool intrinsicHeight = false,
   EdgeInsets insetPadding = const EdgeInsets.all(10.0),
   bool useRootNavigator = true,
   RouteSettings? routeSettings,
   RouteTransitionsBuilder? transitionBuilder,
 }) {
-  Alignment currentDialogAlignmentState = initialAlignment;
-
-  final GlobalKey dialogKey = GlobalKey();
-
   return showGeneralDialog<T>(
     context: context,
     useRootNavigator: useRootNavigator,
@@ -259,67 +262,220 @@ Future<T?> showDraggableDialogWithBuilder<T>({
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: barrierColor,
     pageBuilder: (dialogContext, animation, secondaryAnimation) {
-      return StatefulBuilder(
-        builder: (builderContext, setState) {
-          void handleHeaderPanUpdate(DragUpdateDetails details) {
-            final currentScreenSize = MediaQuery.of(builderContext).size;
+      return _PixelDraggableDialogContent(
+        initialWidth: width ?? (MediaQuery.of(dialogContext).size.width * 0.8),
+        initialHeight: height,
+        initialAlignment: initialAlignment,
+        builder: builder,
+        onResizeUpdate: onResizeUpdate,
+        intrinsicHeight: intrinsicHeight,
+        insetPadding: insetPadding,
+      );
+    },
+  );
+}
 
-            // Measure actual rendered dialog size so slack is accurate even
-            // when the dialog is smaller than the width/height constraints.
-            Size actualDialogSize = Size(
-              width ?? (currentScreenSize.width * 0.8),
-              height ?? (currentScreenSize.height * 0.8),
-            );
-            final renderBox =
-                dialogKey.currentContext?.findRenderObject() as RenderBox?;
-            if (renderBox != null && renderBox.hasSize) {
-              actualDialogSize = Size(
-                width ?? renderBox.size.width,
-                height ?? renderBox.size.height,
-              );
-            }
+class _PixelDraggableDialogContent extends StatefulWidget {
+  final Widget Function(
+    BuildContext context,
+    void Function(DragUpdateDetails) onDragUpdate,
+  ) builder;
+  final void Function(DragUpdateDetails)? onResizeUpdate;
+  final double initialWidth;
+  final double? initialHeight;
+  final Alignment initialAlignment;
+  final bool intrinsicHeight;
+  final EdgeInsets insetPadding;
 
-            final double effectiveScreenWidth =
-                currentScreenSize.width - insetPadding.horizontal;
-            final double effectiveScreenHeight =
-                currentScreenSize.height - insetPadding.vertical;
+  const _PixelDraggableDialogContent({
+    required this.initialWidth,
+    this.initialHeight,
+    required this.initialAlignment,
+    required this.builder,
+    this.onResizeUpdate,
+    this.intrinsicHeight = false,
+    required this.insetPadding,
+  });
 
-            final double halfSlackWidth =
-                (effectiveScreenWidth - actualDialogSize.width) / 2.0;
-            final double halfSlackHeight =
-                (effectiveScreenHeight - actualDialogSize.height) / 2.0;
+  @override
+  State<_PixelDraggableDialogContent> createState() =>
+      _PixelDraggableDialogContentState();
+}
 
-            double dAlignX = 0;
-            if (halfSlackWidth > 1e-6) {
-              dAlignX = details.delta.dx / halfSlackWidth;
-            }
+class _PixelDraggableDialogContentState
+    extends State<_PixelDraggableDialogContent> {
+  Offset? _position;
+  final GlobalKey _dialogKey = GlobalKey();
+  Size _measuredSize = Size.zero;
+  Size? _requestedSize;
+  Size _viewport = Size.zero;
+  bool _sizeSyncScheduled = false;
+  double? _contentHeight;
 
-            double dAlignY = 0;
-            if (halfSlackHeight > 1e-6) {
-              dAlignY = details.delta.dy / halfSlackHeight;
-            }
+  void _handleContentHeightChanged(double? height) {
+    if (!mounted || height == _contentHeight) return;
+    setState(() => _contentHeight = height);
+  }
 
-            setState(() {
-              double newAlignmentX = currentDialogAlignmentState.x + dAlignX;
-              double newAlignmentY = currentDialogAlignmentState.y + dAlignY;
-              currentDialogAlignmentState = Alignment(
-                  newAlignmentX.clamp(-1.0, 1.0),
-                  newAlignmentY.clamp(-1.0, 1.0));
-            });
+  Offset _clampPosition(Offset position, Size size) => Offset(
+        position.dx.clamp(0.0, math.max(0.0, _viewport.width - size.width)),
+        position.dy.clamp(0.0, math.max(0.0, _viewport.height - size.height)),
+      );
+
+  void _scheduleSizeSync() {
+    if (_sizeSyncScheduled) return;
+    _sizeSyncScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _sizeSyncScheduled = false;
+      if (!mounted) return;
+      final box = _dialogKey.currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.hasSize) return;
+      final size = box.size;
+      final position = _position == null
+          ? Offset(
+              (_viewport.width - size.width) *
+                  (widget.initialAlignment.x + 1) /
+                  2,
+              (_viewport.height - size.height) *
+                  (widget.initialAlignment.y + 1) /
+                  2,
+            )
+          : _clampPosition(_position!, size);
+      if (size == _measuredSize && position == _position) return;
+      setState(() {
+        _measuredSize = size;
+        _position = position;
+      });
+    });
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    if (_position == null) return;
+    setState(() {
+      _position = _clampPosition(_position! + details.delta, _measuredSize);
+    });
+  }
+
+  double _resizeExtent(double value, double minimum, double maximum) =>
+      value.clamp(math.min(minimum, maximum), maximum);
+
+  void _resize(DragUpdateDetails details, {required bool fromLeft}) {
+    if (_position == null) return;
+    final position = _position!;
+    final right = position.dx + _measuredSize.width;
+    final width = _resizeExtent(
+      _measuredSize.width + (fromLeft ? -details.delta.dx : details.delta.dx),
+      200,
+      fromLeft ? right : _viewport.width - position.dx,
+    );
+    final height = _resizeExtent(
+      _measuredSize.height + details.delta.dy,
+      150,
+      _viewport.height - position.dy,
+    );
+    setState(() {
+      _requestedSize = Size(width, height);
+      _measuredSize = Size(width, math.min(height, _contentHeight ?? height));
+      _position = Offset(fromLeft ? right - width : position.dx, position.dy);
+    });
+    widget.onResizeUpdate?.call(details);
+  }
+
+  void _handleResizeUpdate(DragUpdateDetails details) =>
+      _resize(details, fromLeft: false);
+
+  void _handleResizeLeftUpdate(DragUpdateDetails details) =>
+      _resize(details, fromLeft: true);
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final padding = EdgeInsets.fromLTRB(
+          math.max(media.viewPadding.left, media.viewInsets.left),
+          math.max(media.viewPadding.top, media.viewInsets.top),
+          math.max(media.viewPadding.right, media.viewInsets.right),
+          math.max(media.viewPadding.bottom, media.viewInsets.bottom),
+        ) +
+        widget.insetPadding;
+    return Padding(
+      padding: padding,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          _viewport = constraints.biggest;
+          final width = math.min(
+            _requestedSize?.width ?? widget.initialWidth,
+            _viewport.width,
+          );
+          final preferredHeight =
+              _requestedSize?.height ?? widget.initialHeight;
+          final maximumHeight = math.min(
+            _viewport.height,
+            _contentHeight ?? double.infinity,
+          );
+          final height = preferredHeight == null
+              ? null
+              : math.min(preferredHeight, maximumHeight);
+          final boundedSize = Size(
+            widget.intrinsicHeight && _requestedSize == null
+                ? math.min(_measuredSize.width, _viewport.width)
+                : width,
+            math.min(height ?? _measuredSize.height, _viewport.height),
+          );
+          if (_position != null) {
+            _position = _clampPosition(_position!, boundedSize);
           }
-
-          return Dialog(
-            alignment: currentDialogAlignmentState,
-            insetPadding: insetPadding,
-            backgroundColor: Colors.transparent,
-            elevation: 0, // Elevation is on the Material child
-            child: KeyedSubtree(
-              key: dialogKey,
-              child: builder(builderContext, handleHeaderPanUpdate),
+          _scheduleSizeSync();
+          final dialog = NotificationListener<SizeChangedLayoutNotification>(
+            onNotification: (_) {
+              _scheduleSizeSync();
+              return false;
+            },
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: width,
+                maxHeight: maximumHeight,
+              ),
+              child: SizedBox(
+                width: widget.intrinsicHeight && _requestedSize == null
+                    ? null
+                    : width,
+                height: height,
+                child: SizeChangedLayoutNotifier(
+                  child: Material(
+                    key: _dialogKey,
+                    type: MaterialType.transparency,
+                    child: ResizeHandleProvider(
+                      onDragUpdate: _handleDragUpdate,
+                      onResizeUpdate: _handleResizeUpdate,
+                      onResizeLeftUpdate: _handleResizeLeftUpdate,
+                      onContentHeightChanged: _handleContentHeightChanged,
+                      child: widget.builder(context, _handleDragUpdate),
+                    ),
+                  ),
+                ),
+              ),
             ),
           );
+          return Stack(
+            children: [
+              if (_position == null)
+                Opacity(
+                  opacity: 0,
+                  child: Align(
+                    alignment: widget.initialAlignment,
+                    child: dialog,
+                  ),
+                )
+              else
+                Positioned(
+                  left: _position!.dx,
+                  top: _position!.dy,
+                  child: dialog,
+                ),
+            ],
+          );
         },
-      );
-    }, // Close pageBuilder
-  );
+      ),
+    );
+  }
 }

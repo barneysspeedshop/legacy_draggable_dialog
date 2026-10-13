@@ -119,19 +119,18 @@ void main() {
       );
     });
 
-    final dialogFinder = find.byType(Dialog);
-    expect(tester.widget<Dialog>(dialogFinder).alignment, Alignment.center);
+    final title = find.text('Drag Title');
+    final start = tester.getCenter(title);
 
     await tester.drag(find.byIcon(Icons.close), const Offset(120, 80));
     await tester.pump();
-    expect(tester.widget<Dialog>(dialogFinder).alignment, Alignment.center);
+    expect(tester.getCenter(title), start);
 
-    await tester.drag(find.text('Drag Title'), const Offset(120, 80));
+    await tester.drag(title, const Offset(120, 80));
     await tester.pump();
-    expect(
-      tester.widget<Dialog>(dialogFinder).alignment,
-      isNot(Alignment.center),
-    );
+    final moved = tester.getCenter(title);
+    expect(moved.dx, greaterThan(start.dx));
+    expect(moved.dy, greaterThan(start.dy));
   });
 
   testWidgets('default scrollable wraps the body in a SingleChildScrollView', (

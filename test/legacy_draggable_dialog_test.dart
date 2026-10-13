@@ -200,18 +200,15 @@ void main() {
     await tester.tap(find.text('Show Dialog'));
     await tester.pumpAndSettle();
 
-    final dialogFinder = find.byType(Dialog);
-    final Dialog dialogBefore = tester.widget(dialogFinder);
-    expect(dialogBefore.alignment, Alignment.center);
+    final title = find.text('Draggable Dialog');
+    final before = tester.getCenter(title);
 
-    // Drag the header
-    // We drag by a significant amount to ensure movement
-    await tester.drag(find.text('Draggable Dialog'), const Offset(200, 200));
+    await tester.drag(title, const Offset(200, 200));
     await tester.pump();
 
-    final Dialog dialogAfter = tester.widget(dialogFinder);
-    expect(dialogAfter.alignment, isNot(Alignment.center));
-    // We can't easily assert exact alignment without knowing screen size, but it should change.
+    final after = tester.getCenter(title);
+    expect(after.dx, greaterThan(before.dx));
+    expect(after.dy, greaterThan(before.dy));
   });
   testWidgets('dialog does not move when size equals screen size',
       (WidgetTester tester) async {
@@ -250,16 +247,12 @@ void main() {
     await tester.tap(find.text('Show Dialog'));
     await tester.pumpAndSettle();
 
-    final dialogFinder = find.byType(Dialog);
-    final Dialog dialogBefore = tester.widget(dialogFinder);
-    expect(dialogBefore.alignment, Alignment.center);
+    final title = find.text('Full Screen Dialog');
+    final before = tester.getCenter(title);
 
-    // Drag the header
-    await tester.drag(find.text('Full Screen Dialog'), const Offset(200, 200));
+    await tester.drag(title, const Offset(200, 200));
     await tester.pump();
 
-    final Dialog dialogAfter = tester.widget(dialogFinder);
-    // Should still be center because slack is 0
-    expect(dialogAfter.alignment, Alignment.center);
+    expect(tester.getCenter(title), before);
   });
 }
