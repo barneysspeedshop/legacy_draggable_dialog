@@ -226,11 +226,12 @@ void main() {
 
     expect(find.text('Scrollable Content'), findsOneWidget);
     expect(find.text('Item 1'), findsOneWidget);
+    final listScrollable = find.descendant(
+      of: find.byType(ListView),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(find.text('Item 5'), 80.0, scrollable: listScrollable);
     expect(find.text('Item 5'), findsOneWidget);
-
-    // Scroll down
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
-    await tester.pump();
 
     await tester.tap(find.text('Close'));
     await tester.pumpAndSettle();
