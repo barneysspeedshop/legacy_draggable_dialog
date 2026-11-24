@@ -88,7 +88,8 @@ Future<T?> showLegacyDraggableDialog<T>({
   double? resizeHandleIconSize,
   bool showHeader = true,
 }) {
-  final bool hasClosingMechanism = onClose != null ||
+  final bool hasClosingMechanism =
+      onClose != null ||
       onOk != null ||
       onCancel != null ||
       (showHeader && header != null) ||
@@ -114,17 +115,17 @@ Future<T?> showLegacyDraggableDialog<T>({
     builder: (dialogContext, onDragUpdate) {
       final dialogTheme =
           (theme ?? DraggableDialogThemeData.from(dialogContext)).copyWith(
-        headerHeight: headerHeight,
-        footerHeight: footerHeight,
-        buttonHeight: buttonHeight,
-        buttonMinWidth: buttonMinWidth,
-        buttonTextSize: buttonTextSize,
-        buttonColor: buttonColor,
-        headerTextSize: headerTextSize,
-        closeIconSize: closeIconSize,
-        titleStyle: titleStyle,
-        closeIconColor: closeIconColor,
-      );
+            headerHeight: headerHeight,
+            footerHeight: footerHeight,
+            buttonHeight: buttonHeight,
+            buttonMinWidth: buttonMinWidth,
+            buttonTextSize: buttonTextSize,
+            buttonColor: buttonColor,
+            headerTextSize: headerTextSize,
+            closeIconSize: closeIconSize,
+            titleStyle: titleStyle,
+            closeIconColor: closeIconColor,
+          );
 
       final Widget? effectiveHeader;
       final bool dragEntireHeader;
@@ -136,12 +137,14 @@ Future<T?> showLegacyDraggableDialog<T>({
         dragEntireHeader = true;
       } else {
         dragEntireHeader = false;
-        final double? effectiveHeaderTextSize = dialogTheme.headerTextSize ??
+        final double? effectiveHeaderTextSize =
+            dialogTheme.headerTextSize ??
             (dialogTheme.headerHeight != null
                 ? dialogTheme.headerHeight! * 0.35
                 : null);
 
-        final double? effectiveCloseIconSize = dialogTheme.closeIconSize ??
+        final double? effectiveCloseIconSize =
+            dialogTheme.closeIconSize ??
             (dialogTheme.headerHeight != null
                 ? dialogTheme.headerHeight! * 0.5
                 : null);
@@ -172,7 +175,8 @@ Future<T?> showLegacyDraggableDialog<T>({
                   iconSize: effectiveCloseIconSize,
                   icon: Icon(
                     Icons.close,
-                    color: dialogTheme.closeIconColor ??
+                    color:
+                        dialogTheme.closeIconColor ??
                         dialogTheme.titleStyle?.color,
                   ),
                   onPressed: onClose,
@@ -195,19 +199,23 @@ Future<T?> showLegacyDraggableDialog<T>({
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: actions
-                .map((e) => Padding(
+                .map(
+                  (e) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: e))
+                    child: e,
+                  ),
+                )
                 .toList(),
           ),
         );
       } else if (onOk != null || onCancel != null) {
         effectiveFooter = DialogFooter(
-            onOk: onOk,
-            onCancel: onCancel,
-            okText: okText,
-            cancelText: cancelText,
-            theme: dialogTheme);
+          onOk: onOk,
+          onCancel: onCancel,
+          okText: okText,
+          cancelText: cancelText,
+          theme: dialogTheme,
+        );
       }
 
       return DraggableDialog(
@@ -239,8 +247,10 @@ Future<T?> showLegacyDraggableDialog<T>({
 Future<T?> showDraggableDialogWithBuilder<T>({
   required BuildContext context,
   required Widget Function(
-          BuildContext context, void Function(DragUpdateDetails) onDragUpdate)
-      builder,
+    BuildContext context,
+    void Function(DragUpdateDetails) onDragUpdate,
+  )
+  builder,
   void Function(DragUpdateDetails)? onResizeUpdate,
   double? width,
   double? height,
@@ -279,7 +289,8 @@ class _PixelDraggableDialogContent extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     void Function(DragUpdateDetails) onDragUpdate,
-  ) builder;
+  )
+  builder;
   final void Function(DragUpdateDetails)? onResizeUpdate;
   final double initialWidth;
   final double? initialHeight;
@@ -318,9 +329,9 @@ class _PixelDraggableDialogContentState
   }
 
   Offset _clampPosition(Offset position, Size size) => Offset(
-        position.dx.clamp(0.0, math.max(0.0, _viewport.width - size.width)),
-        position.dy.clamp(0.0, math.max(0.0, _viewport.height - size.height)),
-      );
+    position.dx.clamp(0.0, math.max(0.0, _viewport.width - size.width)),
+    position.dy.clamp(0.0, math.max(0.0, _viewport.height - size.height)),
+  );
 
   void _scheduleSizeSync() {
     if (_sizeSyncScheduled) return;
@@ -390,7 +401,8 @@ class _PixelDraggableDialogContentState
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final padding = EdgeInsets.fromLTRB(
+    final padding =
+        EdgeInsets.fromLTRB(
           math.max(media.viewPadding.left, media.viewInsets.left),
           math.max(media.viewPadding.top, media.viewInsets.top),
           math.max(media.viewPadding.right, media.viewInsets.right),
