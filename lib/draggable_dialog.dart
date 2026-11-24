@@ -159,8 +159,11 @@ class DraggableDialogThemeData
       titleStyle: TextStyle.lerp(titleStyle, other.titleStyle, t),
       buttonColor: Color.lerp(buttonColor, other.buttonColor, t),
       buttonStyle: ButtonStyle.lerp(buttonStyle, other.buttonStyle, t),
-      buttonTextStyle:
-          TextStyle.lerp(buttonTextStyle, other.buttonTextStyle, t),
+      buttonTextStyle: TextStyle.lerp(
+        buttonTextStyle,
+        other.buttonTextStyle,
+        t,
+      ),
       headerHeight: lerpDouble(headerHeight, other.headerHeight, t),
       footerHeight: lerpDouble(footerHeight, other.footerHeight, t),
       buttonHeight: lerpDouble(buttonHeight, other.buttonHeight, t),
@@ -189,27 +192,33 @@ class DraggableDialogThemeData
             headerColor: Colors.grey[800],
             contentColor: const Color(0xFF202020),
             footerColor: Colors.grey[850],
-            titleStyle:
-                theme.textTheme.titleLarge?.copyWith(color: Colors.white70),
+            titleStyle: theme.textTheme.titleLarge?.copyWith(
+              color: Colors.white70,
+            ),
             buttonStyle: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
+                borderRadius: BorderRadius.circular(5),
+              ),
             ),
-            buttonTextStyle:
-                theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+            buttonTextStyle: theme.textTheme.labelLarge?.copyWith(
+              color: Colors.white,
+            ),
           )
         : DraggableDialogThemeData(
             headerColor: Colors.blueGrey[50],
             contentColor: Colors.white,
             footerColor: Colors.grey[100],
-            titleStyle:
-                theme.textTheme.titleLarge?.copyWith(color: Colors.black87),
+            titleStyle: theme.textTheme.titleLarge?.copyWith(
+              color: Colors.black87,
+            ),
             buttonStyle: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
+                borderRadius: BorderRadius.circular(5),
+              ),
             ),
-            buttonTextStyle:
-                theme.textTheme.labelLarge?.copyWith(color: Colors.white),
+            buttonTextStyle: theme.textTheme.labelLarge?.copyWith(
+              color: Colors.white,
+            ),
           );
 
     final themeExtension = theme.extension<DraggableDialogThemeData>();
@@ -363,12 +372,12 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
         final maxWidth =
             constraints.hasBoundedWidth && constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : double.infinity;
+            ? constraints.maxWidth
+            : double.infinity;
         final maxHeight =
             constraints.hasBoundedHeight && constraints.maxHeight.isFinite
-                ? constraints.maxHeight
-                : screenHeight;
+            ? constraints.maxHeight
+            : screenHeight;
 
         final effectiveWidth = (baseWidth + _widthOffset).clamp(
           dialogTheme.minWidth ?? 200.0,
@@ -383,7 +392,8 @@ class _DraggableDialogState extends State<DraggableDialog> {
           constraints: BoxConstraints(maxHeight: effectiveHeight),
           child: Material(
             elevation: dialogTheme.elevation ?? 4.0,
-            shape: dialogTheme.shape ??
+            shape:
+                dialogTheme.shape ??
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -428,8 +438,10 @@ class _DraggableDialogState extends State<DraggableDialog> {
 
   Widget _buildBody(DraggableDialogThemeData dialogTheme) {
     if (!widget.scrollable) {
-      final content =
-          Material(color: dialogTheme.contentColor, child: widget.body);
+      final content = Material(
+        color: dialogTheme.contentColor,
+        child: widget.body,
+      );
       return widget.expandContent ? Expanded(child: content) : content;
     }
 
@@ -527,27 +539,25 @@ class DialogFooter extends StatelessWidget {
     // Resolve button style with height, width, and color constraints
     ButtonStyle? effectiveButtonStyle = theme.buttonStyle;
     if (theme.buttonHeight != null || theme.buttonMinWidth != null) {
-      effectiveButtonStyle =
-          (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
-        minimumSize: WidgetStateProperty.all(
-          Size(theme.buttonMinWidth ?? 0, theme.buttonHeight ?? 0),
-        ),
-      );
+      effectiveButtonStyle = (effectiveButtonStyle ?? const ButtonStyle())
+          .copyWith(
+            minimumSize: WidgetStateProperty.all(
+              Size(theme.buttonMinWidth ?? 0, theme.buttonHeight ?? 0),
+            ),
+          );
     }
     if (theme.buttonColor != null) {
-      effectiveButtonStyle =
-          (effectiveButtonStyle ?? const ButtonStyle()).copyWith(
-        backgroundColor: WidgetStateProperty.all(theme.buttonColor),
-      );
+      effectiveButtonStyle = (effectiveButtonStyle ?? const ButtonStyle())
+          .copyWith(
+            backgroundColor: WidgetStateProperty.all(theme.buttonColor),
+          );
     }
 
     // Resolve button text style with text size
     TextStyle? effectiveButtonTextStyle = theme.buttonTextStyle;
     if (theme.buttonTextSize != null) {
-      effectiveButtonTextStyle =
-          (effectiveButtonTextStyle ?? const TextStyle()).copyWith(
-        fontSize: theme.buttonTextSize,
-      );
+      effectiveButtonTextStyle = (effectiveButtonTextStyle ?? const TextStyle())
+          .copyWith(fontSize: theme.buttonTextSize);
     }
 
     return Padding(
