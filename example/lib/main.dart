@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:legacy_draggable_dialog/legacy_draggable_dialog.dart';
 import 'package:legacy_draggable_dialog/draggable_dialog.dart';
 import 'package:tabbed_view/tabbed_view.dart';
@@ -23,6 +23,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       themeMode: ThemeMode.system,
+      // tabbed_view still consumes legacy Material themes and localizations.
+      // ignore: deprecated_member_use
+      builder: (context, child) => MaterialUiCompatibilityBridge(child: child!),
       home: const MyHomePage(title: 'Draggable Dialog Demo'),
     );
   }
