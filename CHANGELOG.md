@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Migrate library, tests, and example to standalone Material UI without changing widget behavior. Requires Dart 3.13 and Flutter 3.47 or newer; consumers must also use `material_ui` for Material types.
+
 ## 0.2.0
 
 * **BREAKING**: `showDraggableDialogWithBuilder` positions the dialog with pixel `Offset`s instead of `Dialog.alignment`. Drag and resize stay 1:1 with the pointer, including when dialog content is scaled.

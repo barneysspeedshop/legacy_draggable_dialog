@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:legacy_draggable_dialog/draggable_dialog.dart';
 
 export 'package:legacy_draggable_dialog/draggable_dialog.dart'
